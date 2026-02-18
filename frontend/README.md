@@ -68,7 +68,7 @@ DermAssist-AI/
 
 ---
 
-## 🧠 How the AI Works (Plain English)
+## 🧠 How the AI Works 
 
 The AI model was trained on the **ISIC HAM10000 dataset** — a collection of 10,015 real dermoscopy images of skin lesions, each labeled by expert dermatologists.
 
