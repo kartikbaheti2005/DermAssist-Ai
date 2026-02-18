@@ -7,6 +7,7 @@ import ProcessingLoader from '../components/ProcessingLoader'
 import ResultCard from '../components/ResultCard'
 import ExplainableAI from '../components/ExplainableAI'
 import RecommendationPanel from '../components/RecommendationPanel'
+import { useAuth } from '../context/AuthContext'
 
 // ─── 7 Lesion Classes ────────────────────────────────────────────────────────
 const LESION_CLASSES = [
@@ -20,17 +21,14 @@ const LESION_CLASSES = [
 ]
 
 // ─── Radial Overlay Modal ─────────────────────────────────────────────────────
-// Renders as a fixed-position fullscreen overlay — zero parent clipping possible.
-// Uses a 500×500 SVG for the orbit ring + connector lines,
-// and absolutely-positioned divs (inside a known-size container) for the nodes.
 const RadialOverlay = ({ onClose }) => {
   const [hovered, setHovered] = useState(null)
 
-  const SIZE = 500        // canvas square px
-  const C    = SIZE / 2   // center = 250
-  const R    = 185        // orbit radius px
-  const NS   = 80         // node diameter px
-  const NH   = NS / 2     // node half
+  const SIZE = 500
+  const C    = SIZE / 2
+  const R    = 185
+  const NS   = 80
+  const NH   = NS / 2
 
   const nodes = LESION_CLASSES.map((cls, i) => {
     const deg = -90 + (i * 360) / 7
@@ -40,7 +38,6 @@ const RadialOverlay = ({ onClose }) => {
 
   const hovClass = hovered !== null ? LESION_CLASSES[hovered] : null
 
-  // Close on Escape key
   useEffect(() => {
     const fn = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', fn)
@@ -48,7 +45,6 @@ const RadialOverlay = ({ onClose }) => {
   }, [onClose])
 
   return (
-    // Full-screen backdrop — fixed, covers everything, z-index 9999
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -56,9 +52,8 @@ const RadialOverlay = ({ onClose }) => {
       transition={{ duration: 0.25 }}
       className="fixed inset-0 flex items-center justify-center"
       style={{ zIndex: 9999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(6px)' }}
-      onClick={onClose}  // click backdrop to close
+      onClick={onClose}
     >
-      {/* Inner container — stops backdrop click from closing when clicking nodes */}
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -67,45 +62,23 @@ const RadialOverlay = ({ onClose }) => {
         onClick={(e) => e.stopPropagation()}
         style={{ position: 'relative', width: SIZE, height: SIZE, flexShrink: 0 }}
       >
-
-        {/* ── SVG layer: orbit ring + connector lines ── */}
-        <svg
-          width={SIZE} height={SIZE}
-          style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-        >
-          {/* Outer orbit circle */}
-          <motion.circle
-            cx={C} cy={C} r={R}
-            fill="none" stroke="rgba(147,197,253,0.5)" strokeWidth="1.5" strokeDasharray="8 5"
-            initial={{ opacity: 0, r: 0 }} animate={{ opacity: 1, r: R }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+        <svg width={SIZE} height={SIZE} style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+          <motion.circle cx={C} cy={C} r={R} fill="none" stroke="rgba(147,197,253,0.5)" strokeWidth="1.5" strokeDasharray="8 5"
+            initial={{ opacity: 0, r: 0 }} animate={{ opacity: 1, r: R }} transition={{ duration: 0.5, ease: 'easeOut' }}
           />
-          {/* Connector lines */}
           {nodes.map((n, i) => (
-            <motion.line key={n.code}
-              x1={C} y1={C} x2={n.cx} y2={n.cy}
+            <motion.line key={n.code} x1={C} y1={C} x2={n.cx} y2={n.cy}
               stroke={n.riskColor} strokeWidth="1.5" strokeOpacity={hovered === i ? 0.7 : 0.25} strokeDasharray="5 4"
-              initial={{ opacity: 0, pathLength: 0 }}
-              animate={{ opacity: 1, pathLength: 1 }}
+              initial={{ opacity: 0, pathLength: 0 }} animate={{ opacity: 1, pathLength: 1 }}
               transition={{ delay: 0.15 + i * 0.06, duration: 0.4 }}
               style={{ transition: 'stroke-opacity 0.2s' }}
             />
           ))}
         </svg>
 
-        {/* ── Center button ── */}
-        <motion.button
-          onClick={onClose}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.93 }}
+        <motion.button onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.93 }}
           className="focus:outline-none"
-          style={{
-            position: 'absolute',
-            top:  C - 48, left: C - 48,
-            width: 96, height: 96,
-            borderRadius: '50%',
-            zIndex: 10,
-          }}
+          style={{ position: 'absolute', top: C - 48, left: C - 48, width: 96, height: 96, borderRadius: '50%', zIndex: 10 }}
         >
           <div className="w-full h-full rounded-full bg-blue-600 flex flex-col items-center justify-center"
             style={{ boxShadow: '0 0 0 10px rgba(59,130,246,0.15), 0 0 0 20px rgba(59,130,246,0.07), 0 8px 32px rgba(59,130,246,0.4)' }}
@@ -115,28 +88,11 @@ const RadialOverlay = ({ onClose }) => {
           </div>
         </motion.button>
 
-        {/* ── 7 Orbit nodes ── */}
         {nodes.map((n, i) => (
-          <motion.div
-            key={n.code}
-            style={{
-              position: 'absolute',
-              // Anchor at canvas center
-              top:  C - NH,
-              left: C - NH,
-              width:  NS,
-              height: NS,
-              cursor: 'pointer',
-              zIndex: 5,
-            }}
-            // Animate from center outward using x/y transforms
+          <motion.div key={n.code}
+            style={{ position: 'absolute', top: C - NH, left: C - NH, width: NS, height: NS, cursor: 'pointer', zIndex: 5 }}
             initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-            animate={{
-              x: n.cx - C,
-              y: n.cy - C,
-              opacity: 1,
-              scale: hovered === i ? 1.18 : 1,
-            }}
+            animate={{ x: n.cx - C, y: n.cy - C, opacity: 1, scale: hovered === i ? 1.18 : 1 }}
             transition={{
               x:       { delay: 0.12 + i * 0.07, duration: 0.55, type: 'spring', stiffness: 200, damping: 18 },
               y:       { delay: 0.12 + i * 0.07, duration: 0.55, type: 'spring', stiffness: 200, damping: 18 },
@@ -146,48 +102,27 @@ const RadialOverlay = ({ onClose }) => {
             onMouseEnter={() => setHovered(i)}
             onMouseLeave={() => setHovered(null)}
           >
-            <div
-              className="w-full h-full rounded-full flex flex-col items-center justify-center select-none"
+            <div className="w-full h-full rounded-full flex flex-col items-center justify-center select-none"
               style={{
-                background: n.bg,
-                border: `3px solid ${hovered === i ? n.riskColor : n.border}`,
-                boxShadow: hovered === i
-                  ? `0 0 0 5px ${n.riskColor}30, 0 8px 28px ${n.riskColor}40`
-                  : '0 4px 16px rgba(0,0,0,0.18)',
+                background: n.bg, border: `3px solid ${hovered === i ? n.riskColor : n.border}`,
+                boxShadow: hovered === i ? `0 0 0 5px ${n.riskColor}30, 0 8px 28px ${n.riskColor}40` : '0 4px 16px rgba(0,0,0,0.18)',
                 transition: 'border-color 0.15s, box-shadow 0.15s',
               }}
             >
               <span style={{ fontSize: 22, lineHeight: 1 }}>{n.icon}</span>
-              <span className="text-[10px] font-black mt-1 tracking-wide" style={{ color: n.riskColor }}>
-                {n.short}
-              </span>
+              <span className="text-[10px] font-black mt-1 tracking-wide" style={{ color: n.riskColor }}>{n.short}</span>
             </div>
           </motion.div>
         ))}
 
-        {/* ── Hover tooltip — appears below a hovered node ── */}
         <AnimatePresence>
           {hovClass && (
-            <motion.div
-              key={hovClass.code}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
+            <motion.div key={hovClass.code}
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}
               transition={{ duration: 0.15 }}
-              style={{
-                position: 'absolute',
-                // Position the tooltip at the bottom of the canvas, centered
-                bottom: -120,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 300,
-                zIndex: 20,
-                pointerEvents: 'none',
-              }}
+              style={{ position: 'absolute', bottom: -120, left: '50%', transform: 'translateX(-50%)', width: 300, zIndex: 20, pointerEvents: 'none' }}
             >
-              <div className="rounded-2xl p-4 shadow-2xl border-2"
-                style={{ background: hovClass.bg, borderColor: hovClass.riskColor }}
-              >
+              <div className="rounded-2xl p-4 shadow-2xl border-2" style={{ background: hovClass.bg, borderColor: hovClass.riskColor }}>
                 <div className="flex items-center gap-3 mb-2">
                   <span style={{ fontSize: 28 }}>{hovClass.icon}</span>
                   <div className="flex-1">
@@ -196,9 +131,7 @@ const RadialOverlay = ({ onClose }) => {
                   </div>
                   <span className="text-xs font-bold px-2.5 py-1 rounded-full"
                     style={{ background: hovClass.riskColor + '22', color: hovClass.riskColor }}
-                  >
-                    {hovClass.risk} Risk
-                  </span>
+                  >{hovClass.risk} Risk</span>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">{hovClass.desc}</p>
               </div>
@@ -206,41 +139,25 @@ const RadialOverlay = ({ onClose }) => {
           )}
         </AnimatePresence>
 
-        {/* ── Close button (top-right of canvas) ── */}
-        <motion.button
-          onClick={onClose}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="focus:outline-none"
-          style={{ position: 'absolute', top: -16, right: -16, zIndex: 20 }}
+        <motion.button onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+          className="focus:outline-none" style={{ position: 'absolute', top: -16, right: -16, zIndex: 20 }}
         >
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-xl">
             <X className="w-5 h-5 text-gray-600" />
           </div>
         </motion.button>
 
-        {/* ── Instruction text below canvas ── */}
-        <div style={{ position: 'absolute', bottom: -52, left: 0, right: 0 }}
-          className="text-center"
-        >
+        <div style={{ position: 'absolute', bottom: -52, left: 0, right: 0 }} className="text-center">
           <p className="text-white/70 text-sm font-medium">
             Hover any node to learn more · Click center or press <kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Esc</kbd> to close
           </p>
         </div>
 
-        {/* ── Risk legend ── */}
-        <div style={{ position: 'absolute', top: -52, left: 0, right: 0 }}
-          className="flex items-center justify-center gap-4"
-        >
+        <div style={{ position: 'absolute', top: -52, left: 0, right: 0 }} className="flex items-center justify-center gap-4">
           <p className="text-white font-bold text-sm mr-2">7 Skin Lesion Classes</p>
-          {[
-            { label: 'High (3)',     color: '#ef4444' },
-            { label: 'Moderate (3)', color: '#f59e0b' },
-            { label: 'Low (1)',       color: '#10b981' },
-          ].map(r => (
+          {[{ label: 'High (3)', color: '#ef4444' }, { label: 'Moderate (3)', color: '#f59e0b' }, { label: 'Low (1)', color: '#10b981' }].map(r => (
             <div key={r.label} className="flex items-center gap-1.5 text-xs font-semibold text-white/80">
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: r.color }} />
-              {r.label}
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: r.color }} />{r.label}
             </div>
           ))}
         </div>
@@ -319,23 +236,13 @@ const DatasetRing = () => {
   )
 }
 
-// ─── Card 2: Compact trigger (opens the overlay) ──────────────────────────────
+// ─── Card 2: Lesion Types ─────────────────────────────────────────────────────
 const LesionTypesCard = ({ onOpen }) => (
   <div className="flex flex-col items-center">
-    <motion.button
-      onClick={onOpen}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="focus:outline-none relative"
-    >
-      {/* Spinning dashed ring */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-        style={{ position:'absolute', width:88, height:88, top:-4, left:-4,
-          border:'2px dashed #93c5fd', borderRadius:'50%', opacity:0.7, pointerEvents:'none' }}
+    <motion.button onClick={onOpen} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="focus:outline-none relative">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        style={{ position:'absolute', width:88, height:88, top:-4, left:-4, border:'2px dashed #93c5fd', borderRadius:'50%', opacity:0.7, pointerEvents:'none' }}
       />
-      {/* 7 colored dots on the ring */}
       {[0,1,2,3,4,5,6].map(i => {
         const a = (i/7)*2*Math.PI
         const colors = ['#ef4444','#ef4444','#ef4444','#f59e0b','#f59e0b','#f59e0b','#10b981']
@@ -346,31 +253,26 @@ const LesionTypesCard = ({ onOpen }) => (
           }} />
         )
       })}
-      {/* Center orb */}
       <div className="w-20 h-20 rounded-full bg-blue-600 flex flex-col items-center justify-center shadow-lg shadow-blue-200">
         <p className="text-white font-black text-2xl leading-none">7</p>
         <p className="text-blue-200 text-[9px] font-bold tracking-widest mt-0.5">CLASS</p>
       </div>
     </motion.button>
-
     <div className="text-center mt-3">
       <p className="text-base font-bold text-gray-800">Lesion Types</p>
-      <p className="text-xs text-gray-400 mt-0.5 group-hover:text-blue-500">Click to explore in circle</p>
+      <p className="text-xs text-gray-400 mt-0.5">Click to explore in circle</p>
     </div>
-
-    {/* Mini risk legend */}
     <div className="mt-4 flex flex-col gap-1.5 w-full">
       {[
-        { label:'High Risk',     count:3, color:'#ef4444', bg:'#fef2f2' },
+        { label:'High Risk', count:3, color:'#ef4444', bg:'#fef2f2' },
         { label:'Moderate Risk', count:3, color:'#f59e0b', bg:'#fffbeb' },
-        { label:'Low Risk',      count:1, color:'#10b981', bg:'#f0fdf4' },
+        { label:'Low Risk', count:1, color:'#10b981', bg:'#f0fdf4' },
       ].map(r => (
         <div key={r.label} className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold"
           style={{ background: r.bg, color: r.color }}
         >
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ background: r.color }} />
-            {r.label}
+            <span className="w-2 h-2 rounded-full" style={{ background: r.color }} />{r.label}
           </div>
           <span className="font-black">{r.count} types</span>
         </div>
@@ -379,7 +281,7 @@ const LesionTypesCard = ({ onOpen }) => (
   </div>
 )
 
-// ─── Card 3: AI Radar Scanner ─────────────────────────────────────────────────
+// ─── Card 3: Scan Pulse ───────────────────────────────────────────────────────
 const ScanPulse = () => (
   <div className="flex flex-col items-center">
     <div className="relative w-32 h-32">
@@ -388,23 +290,16 @@ const ScanPulse = () => (
           style={{ width:r*2, height:r*2, top:'50%', left:'50%', transform:'translate(-50%,-50%)', opacity:0.5-i*0.12 }}
         />
       ))}
-      <motion.div className="absolute inset-0" animate={{ rotate:360 }}
-        transition={{ duration:2.5, repeat:Infinity, ease:'linear' }}
-      >
+      <motion.div className="absolute inset-0" animate={{ rotate:360 }} transition={{ duration:2.5, repeat:Infinity, ease:'linear' }}>
         <div style={{ position:'absolute', width:'50%', height:1.5, top:'50%', left:'50%',
-          transformOrigin:'0% 50%', background:'linear-gradient(to right, transparent, #3b82f6)',
-          filter:'drop-shadow(0 0 3px #3b82f6)' }}
+          transformOrigin:'0% 50%', background:'linear-gradient(to right, transparent, #3b82f6)', filter:'drop-shadow(0 0 3px #3b82f6)' }}
         />
       </motion.div>
-      <motion.div className="absolute rounded-full bg-cyan-400"
-        style={{ width:6, height:6, top:'28%', left:'68%' }}
-        animate={{ opacity:[0,1,0], scale:[0.5,1.4,0.5] }}
-        transition={{ duration:2.5, repeat:Infinity, delay:0.3 }}
+      <motion.div className="absolute rounded-full bg-cyan-400" style={{ width:6, height:6, top:'28%', left:'68%' }}
+        animate={{ opacity:[0,1,0], scale:[0.5,1.4,0.5] }} transition={{ duration:2.5, repeat:Infinity, delay:0.3 }}
       />
-      <motion.div className="absolute rounded-full bg-green-400"
-        style={{ width:5, height:5, top:'60%', left:'35%' }}
-        animate={{ opacity:[0,1,0], scale:[0.5,1.3,0.5] }}
-        transition={{ duration:2.5, repeat:Infinity, delay:1.1 }}
+      <motion.div className="absolute rounded-full bg-green-400" style={{ width:5, height:5, top:'60%', left:'35%' }}
+        animate={{ opacity:[0,1,0], scale:[0.5,1.3,0.5] }} transition={{ duration:2.5, repeat:Infinity, delay:1.1 }}
       />
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="w-2 h-2 rounded-full bg-blue-500 shadow-lg shadow-blue-300" />
@@ -432,11 +327,13 @@ const ScanPulse = () => (
 
 // ─── Main Home Component ──────────────────────────────────────────────────────
 const Home = () => {
+  const { token } = useAuth()   // ← get JWT token from auth context
+
   const [selectedImage, setSelectedImage] = useState(null)
   const [isAnalyzing,   setIsAnalyzing]   = useState(false)
   const [result,        setResult]        = useState(null)
   const [error,         setError]         = useState(null)
-  const [showOverlay,   setShowOverlay]   = useState(false)   // ← controls radial overlay
+  const [showOverlay,   setShowOverlay]   = useState(false)
 
   const handleAnalyze = async () => {
     if (!selectedImage) { setError('Please select an image first'); return }
@@ -445,7 +342,10 @@ const Home = () => {
     formData.append('file', selectedImage)
     try {
       const res = await axios.post('http://127.0.0.1:8000/predict', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...(token && { 'Authorization': `Bearer ${token}` }),  // ← sends token if logged in
+        },
       })
       setTimeout(() => { setResult(res.data); setIsAnalyzing(false) }, 4800)
     } catch (err) {
@@ -459,7 +359,6 @@ const Home = () => {
   return (
     <div className="min-h-screen">
 
-      {/* ── Fixed overlay — renders on top of everything, no clipping ────────── */}
       <AnimatePresence>
         {showOverlay && <RadialOverlay onClose={() => setShowOverlay(false)} />}
       </AnimatePresence>
@@ -467,11 +366,7 @@ const Home = () => {
       {/* ── Hero Section ─────────────────────────────────────────────────────── */}
       <section className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <motion.div
-            initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.6 }} className="text-center"
-          >
+          <motion.div initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6 }} className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Detect Skin Cancer Early
               <span className="block text-blue-600 mt-2">Using AI Technology</span>
@@ -494,40 +389,27 @@ const Home = () => {
             </div>
           </motion.div>
 
-          {/* ── Stats Cards ─────────────────────────────────────────────────── */}
-          <motion.div
-            initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.6, delay:0.3 }} className="mt-16"
-          >
+          {/* ── Stats Cards ── */}
+          <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, delay:0.3 }} className="mt-16">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-
-              {/* Card 1 */}
               <div className="bg-white rounded-2xl p-7 shadow-lg border border-blue-50 hover:shadow-xl transition-shadow duration-300 flex flex-col items-center">
                 <DatasetRing />
               </div>
-
-              {/* Card 2 — clicking opens the fixed-position radial overlay */}
               <div className="bg-white rounded-2xl p-7 shadow-xl border-2 border-blue-100 hover:border-blue-300 transition-all duration-300 flex flex-col items-center relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                  <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md tracking-widest uppercase">
-                    Interactive
-                  </span>
+                  <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md tracking-widest uppercase">Interactive</span>
                 </div>
                 <LesionTypesCard onOpen={() => setShowOverlay(true)} />
               </div>
-
-              {/* Card 3 */}
               <div className="bg-white rounded-2xl p-7 shadow-lg border border-blue-50 hover:shadow-xl transition-shadow duration-300 flex flex-col items-center">
                 <ScanPulse />
               </div>
-
             </div>
           </motion.div>
-
         </div>
       </section>
 
-      {/* ── Upload Section ───────────────────────────────────────────────────── */}
+      {/* ── Upload Section ── */}
       <section id="upload-section" className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <UploadCard
@@ -553,32 +435,28 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── Processing Animation ─────────────────────────────────────────────── */}
+      {/* ── Processing Animation ── */}
       {isAnalyzing && (
         <section className="py-8 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"><ProcessingLoader /></div>
         </section>
       )}
 
-      {/* ── Results ──────────────────────────────────────────────────────────── */}
+      {/* ── Results ── */}
       {result && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <ResultCard result={result} />
-            <ExplainableAI diagnosis={result.diagnosis} />
+            <ExplainableAI diagnosis={result.diagnosis} allScores={result.all_scores} />
             <RecommendationPanel riskLevel={result.risk_level} />
           </div>
         </section>
       )}
 
-      {/* ── ABCDE Awareness ──────────────────────────────────────────────────── */}
+      {/* ── ABCDE Awareness ── */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-            viewport={{ once:true }} transition={{ duration:0.6 }}
-            className="text-center mb-12"
-          >
+          <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6 }} className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">The ABCDE Rule of Melanoma</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Learn the warning signs that may indicate melanoma, the most serious type of skin cancer
@@ -587,11 +465,11 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {[
-              { letter:'A', title:'Asymmetry', description:'One half of the mole does not match the other half',                       color:'blue'   },
-              { letter:'B', title:'Border',    description:'Edges are irregular, ragged, notched, or blurred',                         color:'purple' },
+              { letter:'A', title:'Asymmetry', description:'One half of the mole does not match the other half', color:'blue' },
+              { letter:'B', title:'Border',    description:'Edges are irregular, ragged, notched, or blurred', color:'purple' },
               { letter:'C', title:'Color',     description:'Color is not uniform — shades of brown, black, pink, red, white, or blue', color:'indigo' },
-              { letter:'D', title:'Diameter',  description:'The spot is larger than 6mm (about the size of a pencil eraser)',           color:'cyan'   },
-              { letter:'E', title:'Evolving',  description:'The mole is changing in size, shape, or color over time',                  color:'teal'   },
+              { letter:'D', title:'Diameter',  description:'The spot is larger than 6mm (about the size of a pencil eraser)', color:'cyan' },
+              { letter:'E', title:'Evolving',  description:'The mole is changing in size, shape, or color over time', color:'teal' },
             ].map((item, index) => (
               <motion.div key={item.letter}
                 initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
@@ -607,9 +485,7 @@ const Home = () => {
             ))}
           </div>
 
-          <motion.div
-            initial={{ opacity:0 }} whileInView={{ opacity:1 }}
-            viewport={{ once:true }} transition={{ duration:0.6, delay:0.5 }}
+          <motion.div initial={{ opacity:0 }} whileInView={{ opacity:1 }} viewport={{ once:true }} transition={{ duration:0.6, delay:0.5 }}
             className="mt-12 p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl"
           >
             <p className="text-center text-gray-700">
@@ -618,7 +494,6 @@ const Home = () => {
               improves treatment outcomes.
             </p>
           </motion.div>
-
         </div>
       </section>
 

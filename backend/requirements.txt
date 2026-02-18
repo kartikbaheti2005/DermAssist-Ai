@@ -6,3 +6,6 @@ numpy
 opencv-python-headless 
 Pillow 
 python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+pytz
