@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { User, Mail, Phone, Calendar, Shield, Clock, Activity, AlertTriangle, CheckCircle, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  User, Mail, Phone, Calendar, Shield, Clock,
+  Activity, AlertTriangle, CheckCircle, TrendingUp,
+  Eye, ChevronRight, Scan
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 
 const API = 'http://localhost:8000'
 
 const RISK_STYLES = {
-  'High Risk':     { badge: 'bg-red-100 text-red-700 border-red-200',     dot: 'bg-red-500',     icon: AlertTriangle },
-  'Moderate Risk': { badge: 'bg-amber-100 text-amber-700 border-amber-200', dot: 'bg-amber-400',  icon: AlertTriangle },
-  'Low Risk':      { badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: CheckCircle },
+  'High Risk':     { badge: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/25 dark:text-red-400 dark:border-red-800/50',     bar: 'bg-red-500',     dot: 'bg-red-500' },
+  'Moderate Risk': { badge: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/25 dark:text-amber-400 dark:border-amber-800/50', bar: 'bg-amber-400', dot: 'bg-amber-400' },
+  'Low Risk':      { badge: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/25 dark:text-emerald-400 dark:border-emerald-800/50', bar: 'bg-emerald-500', dot: 'bg-emerald-500' },
 }
 
 const NAME_MAP = {
@@ -17,227 +21,362 @@ const NAME_MAP = {
   bkl: 'Benign Keratosis', df: 'Dermatofibroma', vasc: 'Vascular Lesion', nv: 'Melanocytic Nevi',
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-const StatCard = ({ icon: Icon, label, value, color }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-blue-50 p-5 flex items-center gap-4">
-    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
-      <Icon className="w-6 h-6 text-white" />
+// ── Animated stat ring ────────────────────────────────────────────────────────
+const StatRing = ({ value, max, color, size = 80 }) => {
+  const r    = size / 2 - 6
+  const circ = 2 * Math.PI * r
+  const pct  = max > 0 ? Math.min(value / max, 1) : 0
+
+  return (
+    <svg width={size} height={size} className="-rotate-90">
+      <circle cx={size/2} cy={size/2} r={r} fill="none"
+        className="stroke-gray-100 dark:stroke-[#1a3260]" strokeWidth="6" />
+      <motion.circle
+        cx={size/2} cy={size/2} r={r} fill="none"
+        stroke={color} strokeWidth="6" strokeLinecap="round"
+        initial={{ strokeDashoffset: circ }}
+        animate={{ strokeDashoffset: circ - pct * circ }}
+        transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
+        strokeDasharray={circ}
+        style={{ filter: `drop-shadow(0 0 6px ${color}60)` }}
+      />
+    </svg>
+  )
+}
+
+// ── Stat Card ─────────────────────────────────────────────────────────────────
+const StatCard = ({ icon: Icon, label, value, color, ringColor, max, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.5 }}
+    className="rounded-2xl p-5 border flex items-center gap-4 relative overflow-hidden
+               bg-white border-blue-50 shadow-sm hover:shadow-md transition-all duration-300
+               dark:bg-[#0d1f3c] dark:border-[#1a3260] dark:hover:border-[#2d5aaa]"
+  >
+    {/* Background glow */}
+    <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10"
+      style={{ background: ringColor }} />
+
+    <div className="relative">
+      <StatRing value={value} max={max || Math.max(value, 1)} color={ringColor} size={64} />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Icon className="w-5 h-5" style={{ color: ringColor }} />
+      </div>
     </div>
     <div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-sm text-gray-500">{label}</p>
+      <motion.p
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        transition={{ delay: delay + 0.6 }}
+        className="text-2xl font-black text-gray-900 dark:text-[#e8f0ff]"
+      >
+        {value}
+      </motion.p>
+      <p className="text-sm text-gray-500 dark:text-[#6b8fc2] font-medium">{label}</p>
     </div>
-  </div>
+  </motion.div>
 )
 
-// ─── Scan History Card ────────────────────────────────────────────────────────
+// ── Scan History Card ─────────────────────────────────────────────────────────
 const ScanCard = ({ scan, index }) => {
-  const risk = scan.risk_level || 'Low Risk'
+  const risk  = scan.risk_level || 'Low Risk'
   const style = RISK_STYLES[risk] || RISK_STYLES['Low Risk']
-  const Icon = style.icon
-  const diagnosisName = NAME_MAP[scan.predicted_label] || scan.predicted_label
-  const confidence = scan.confidence_score ? Math.round(scan.confidence_score * 100) : 0
-  const date = scan.created_at ? new Date(scan.created_at).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  }) : 'Unknown date'
+  const name  = NAME_MAP[scan.predicted_label] || scan.predicted_label
+  const conf  = scan.confidence_score ? Math.round(scan.confidence_score * 100) : 0
+  const date  = scan.created_at
+    ? new Date(scan.created_at).toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      })
+    : 'Unknown date'
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07 }}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow duration-200"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.06, duration: 0.4 }}
+      whileHover={{ x: 4, transition: { duration: 0.15 } }}
+      className="rounded-2xl border p-4 flex items-center gap-4 cursor-pointer
+                 bg-white border-gray-100 shadow-sm hover:shadow-md
+                 dark:bg-[#0d1f3c] dark:border-[#1a3260] dark:hover:border-[#2d5aaa]
+                 transition-all duration-200 group"
     >
-      {/* Risk dot */}
-      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${style.dot}`} />
+      {/* Risk indicator bar */}
+      <div className={`w-1.5 h-12 rounded-full flex-shrink-0 ${style.dot}`} />
+
+      {/* Scan image thumbnail if available */}
+      {scan.image_url ? (
+        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#112248]">
+          <img src={`http://localhost:8000${scan.image_url}`} alt="scan"
+            className="w-full h-full object-cover"
+            onError={e => { e.target.style.display = 'none' }}
+          />
+        </div>
+      ) : (
+        <div className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center
+                        bg-gray-100 dark:bg-[#112248]">
+          <Scan className="w-5 h-5 text-gray-400 dark:text-[#2d4a78]" />
+        </div>
+      )}
 
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-semibold text-gray-900">{diagnosisName}</p>
-          <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${style.badge}`}>
+          <p className="font-bold text-gray-900 dark:text-[#e8f0ff] text-sm">{name}</p>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${style.badge}`}>
             {risk}
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-1">
-          <span className="text-sm text-gray-500 flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> {date}
-          </span>
+        <div className="flex items-center gap-1.5 mt-1">
+          <Clock className="w-3 h-3 text-gray-400 dark:text-[#2d4a78]" />
+          <span className="text-xs text-gray-500 dark:text-[#6b8fc2]">{date}</span>
         </div>
       </div>
 
-      {/* Confidence */}
+      {/* Confidence bar */}
       <div className="text-right flex-shrink-0">
-        <p className="text-lg font-bold text-gray-800">{confidence}%</p>
-        <p className="text-xs text-gray-400">confidence</p>
+        <p className="text-lg font-black text-gray-800 dark:text-[#e8f0ff]">{conf}%</p>
+        <div className="w-16 h-1.5 bg-gray-100 dark:bg-[#1a3260] rounded-full mt-1 overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${conf}%` }}
+            transition={{ delay: index * 0.06 + 0.3, duration: 0.6, ease: 'easeOut' }}
+            className={`h-full rounded-full ${style.dot}`}
+          />
+        </div>
+        <p className="text-[9px] text-gray-400 dark:text-[#2d4a78] mt-0.5">confidence</p>
       </div>
+
+      <ChevronRight className="w-4 h-4 text-gray-300 dark:text-[#1a3260] group-hover:text-blue-400 transition-colors flex-shrink-0" />
     </motion.div>
   )
 }
 
-// ─── Main Profile Page ─────────────────────────────────────────────────────────
+// ── Info Row ──────────────────────────────────────────────────────────────────
+const InfoRow = ({ icon: Icon, label, value, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.4 }}
+    className="flex items-center gap-4 p-4 rounded-2xl
+               bg-gray-50 dark:bg-[#070e1c]
+               border border-gray-100 dark:border-[#1a3260]
+               hover:border-blue-200 dark:hover:border-[#2d5aaa]
+               transition-all duration-200 group"
+  >
+    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
+                    bg-blue-50 dark:bg-[#112248] group-hover:bg-blue-100 dark:group-hover:bg-[#1a3260]
+                    transition-colors duration-200">
+      <Icon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+    </div>
+    <div className="min-w-0 flex-1">
+      <p className="text-[10px] text-gray-400 dark:text-[#2d4a78] font-bold uppercase tracking-widest">
+        {label}
+      </p>
+      <p className="text-gray-800 dark:text-[#e8f0ff] font-semibold text-sm truncate mt-0.5">
+        {value || '—'}
+      </p>
+    </div>
+  </motion.div>
+)
+
+// ── Main Profile ──────────────────────────────────────────────────────────────
 const ProfilePage = () => {
   const { user, token } = useAuth()
-  const [scans, setScans] = useState([])
+  const [scans,       setScans]       = useState([])
   const [loadingScans, setLoadingScans] = useState(true)
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab,   setActiveTab]   = useState('profile')
 
   useEffect(() => {
     if (token) {
-      axios.get(`${API}/user/scans`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      axios.get(`${API}/user/scans`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setScans(res.data))
         .catch(() => setScans([]))
         .finally(() => setLoadingScans(false))
     }
   }, [token])
 
-  const highRisk  = scans.filter(s => s.risk_level === 'High Risk').length
-  const totalScans = scans.length
+  const total    = scans.length
+  const highRisk = scans.filter(s => s.risk_level === 'High Risk').length
+  const safe     = total - highRisk
 
-  const getInitials = (name) => {
-    if (!name) return '?'
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-  }
+  const getInitials = (name) =>
+    name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'
+
+  const tabs = [
+    { id: 'profile', label: '👤 Profile' },
+    { id: 'history', label: '🕐 Scan History' },
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-10 px-4">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen py-10 px-4 bg-gradient-to-br from-blue-50/50 via-white to-cyan-50/50
+                    dark:bg-none dark:bg-[#060d1f]">
+      <div className="max-w-4xl mx-auto space-y-5">
 
-        {/* ── Header Card ── */}
+        {/* ── Header ── */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg border border-blue-50 p-8"
+          transition={{ duration: 0.6 }}
+          className="rounded-3xl p-6 border relative overflow-hidden
+                     bg-white border-blue-50 shadow-lg
+                     dark:bg-[#0d1f3c] dark:border-[#1a3260]"
+          style={{ boxShadow: '0 8px 40px rgba(59,130,246,0.1)' }}
         >
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 shadow-lg">
-              {getInitials(user?.full_name)}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user?.full_name}</h1>
-              <p className="text-gray-500">@{user?.username}</p>
-              <span className="inline-flex items-center gap-1 mt-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">
-                <Shield className="w-3 h-3" /> {user?.role || 'user'}
-              </span>
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 opacity-5 dark:opacity-10"
+            style={{ background: 'radial-gradient(circle, #3b82f6, transparent)', transform: 'translate(30%, -30%)' }}
+          />
+
+          <div className="flex items-center gap-5 relative">
+            {/* Avatar */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative flex-shrink-0"
+            >
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-xl"
+                style={{ background: 'linear-gradient(135deg, #3b82f6, #06b6d4)' }}
+              >
+                {getInitials(user?.full_name)}
+              </div>
+              <motion.div
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute inset-0 rounded-2xl"
+                style={{ background: 'linear-gradient(135deg, #3b82f6, #06b6d4)', filter: 'blur(8px)' }}
+              />
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 rounded-full border-2 border-white dark:border-[#0d1f3c]" />
+            </motion.div>
+
+            {/* User info */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-black text-gray-900 dark:text-[#e8f0ff] truncate">
+                {user?.full_name}
+              </h1>
+              <p className="text-gray-500 dark:text-[#6b8fc2] font-medium">
+                @{user?.username}
+              </p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold
+                                 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  <Shield className="w-3 h-3" /> {user?.role || 'user'}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold
+                                 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Active
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold
+                                 bg-gray-100 text-gray-600 dark:bg-[#112248] dark:text-[#6b8fc2]">
+                  <TrendingUp className="w-3 h-3" /> {total} scan{total !== 1 ? 's' : ''}
+                </span>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Stats Row ── */}
+        {/* ── Stats ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard icon={Activity} label="Total Scans"     value={totalScans} color="bg-blue-500" />
-          <StatCard icon={AlertTriangle} label="High Risk Findings" value={highRisk} color="bg-red-500" />
-          <StatCard icon={CheckCircle} label="Safe Results"  value={totalScans - highRisk} color="bg-emerald-500" />
+          <StatCard icon={Activity}      label="Total Scans"         value={total}    max={total}    ringColor="#3b82f6" delay={0.1} />
+          <StatCard icon={AlertTriangle} label="High Risk Findings"  value={highRisk} max={total}    ringColor="#ef4444" delay={0.2} />
+          <StatCard icon={CheckCircle}   label="Safe Results"        value={safe}     max={total}    ringColor="#10b981" delay={0.3} />
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex gap-2 bg-gray-100 rounded-xl p-1 w-fit">
-          {['profile', 'history'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize ${
-                activeTab === tab
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+          className="flex gap-1 p-1 rounded-2xl w-fit
+                     bg-gray-100 dark:bg-[#0d1f3c] border border-transparent dark:border-[#1a3260]"
+        >
+          {tabs.map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-white dark:bg-[#112248] text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-500 dark:text-[#6b8fc2] hover:text-gray-700 dark:hover:text-[#a8c0e8]'
               }`}
             >
-              {tab === 'profile' ? '👤 Profile' : '🕐 Scan History'}
+              {tab.label}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {/* ── Profile Tab ── */}
-        {activeTab === 'profile' && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg border border-blue-50 p-8"
-          >
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Personal Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <AnimatePresence mode="wait">
+          {activeTab === 'profile' && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-3xl p-6 border shadow-sm
+                         bg-white border-blue-50
+                         dark:bg-[#0d1f3c] dark:border-[#1a3260]"
+            >
+              <h2 className="text-lg font-black text-gray-900 dark:text-[#e8f0ff] mb-5 flex items-center gap-2">
+                <User className="w-5 h-5 text-blue-500" /> Personal Information
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <InfoRow icon={User}     label="Full Name"     value={user?.full_name}     delay={0.05} />
+                <InfoRow icon={Mail}     label="Email"         value={user?.email}         delay={0.10} />
+                <InfoRow icon={User}     label="Username"      value={`@${user?.username || '—'}`} delay={0.15} />
+                <InfoRow icon={Calendar} label="Date of Birth" value={user?.date_of_birth} delay={0.20} />
+                <InfoRow icon={Phone}    label="Phone"         value={user?.phone_number}  delay={0.25} />
+                <InfoRow icon={User}     label="Gender"        value={user?.gender}        delay={0.30} />
+              </div>
+            </motion.div>
+          )}
 
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <User className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Full Name</p>
-                  <p className="text-gray-800 font-medium">{user?.full_name || '—'}</p>
+          {/* ── History Tab ── */}
+          {activeTab === 'history' && (
+            <motion.div
+              key="history"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-black text-gray-900 dark:text-[#e8f0ff] flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-blue-500" /> Scan History
+                </h2>
+                <span className="text-sm text-gray-400 dark:text-[#2d4a78] font-medium bg-gray-100 dark:bg-[#112248] px-3 py-1 rounded-full">
+                  {total} scan{total !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              {loadingScans ? (
+                <div className="flex flex-col items-center justify-center py-16 gap-3">
+                  <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-gray-400 dark:text-[#2d4a78] text-sm font-medium">Loading your scans...</p>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <Mail className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Email</p>
-                  <p className="text-gray-800 font-medium">{user?.email || '—'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <User className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Username</p>
-                  <p className="text-gray-800 font-medium">@{user?.username || '—'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Date of Birth</p>
-                  <p className="text-gray-800 font-medium">{user?.date_of_birth || '—'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <Phone className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Phone</p>
-                  <p className="text-gray-800 font-medium">{user?.phone_number || '—'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <User className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Gender</p>
-                  <p className="text-gray-800 font-medium">{user?.gender || '—'}</p>
-                </div>
-              </div>
-
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── History Tab ── */}
-        {activeTab === 'history' && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-3"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-bold text-gray-900">Scan History</h2>
-              <span className="text-sm text-gray-400">{totalScans} total scan{totalScans !== 1 ? 's' : ''}</span>
-            </div>
-
-            {loadingScans ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : scans.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                <Activity className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium">No scans yet</p>
-                <p className="text-gray-400 text-sm mt-1">Upload a skin image on the home page to get started</p>
-              </div>
-            ) : (
-              scans.map((scan, i) => <ScanCard key={scan.id} scan={scan} index={i} />)
-            )}
-          </motion.div>
-        )}
+              ) : scans.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="rounded-3xl border p-14 text-center
+                             bg-white border-gray-100 shadow-sm
+                             dark:bg-[#0d1f3c] dark:border-[#1a3260]"
+                >
+                  <motion.div
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <Activity className="w-14 h-14 text-gray-200 dark:text-[#1a3260] mx-auto mb-4" />
+                  </motion.div>
+                  <p className="text-gray-600 dark:text-[#6b8fc2] font-bold text-lg">No scans yet</p>
+                  <p className="text-gray-400 dark:text-[#2d4a78] text-sm mt-1.5 font-medium">
+                    Upload a skin image on the home page to get started
+                  </p>
+                </motion.div>
+              ) : (
+                scans.map((scan, i) => <ScanCard key={scan.id} scan={scan} index={i} />)
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

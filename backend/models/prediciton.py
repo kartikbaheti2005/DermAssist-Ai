@@ -29,6 +29,7 @@ class Prediction(Base):
     extra_metadata = Column(Text)    # JSON string if needed
 
     status = Column(String(20), default="completed")
+    
 
     created_at = Column(DateTime, default=ist_now)
 

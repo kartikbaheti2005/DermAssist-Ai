@@ -1,69 +1,71 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
 
-const AuthContext = createContext(null)
-
 const API = 'http://localhost:8000'
+const AuthContext = createContext(null)
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser]       = useState(null)
   const [token, setToken]     = useState(() => localStorage.getItem('dermassist_token'))
   const [loading, setLoading] = useState(true)
 
-  // On mount — verify stored token and load full profile
+  // On mount — verify token and load user profile
   useEffect(() => {
-    if (token) {
-      axios.get(`${API}/user/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => setUser(res.data))
-        .catch(() => {
-          localStorage.removeItem('dermassist_token')
-          setToken(null)
-          setUser(null)
-        })
-        .finally(() => setLoading(false))
-    } else {
+    const savedToken = localStorage.getItem('dermassist_token')
+    if (!savedToken) {
       setLoading(false)
+      return
     }
+    axios.get(`${API}/user/me`, {
+      headers: { Authorization: `Bearer ${savedToken}` }
+    })
+      .then(res => {
+        setUser(res.data)
+        setToken(savedToken)
+      })
+      .catch(() => {
+        localStorage.removeItem('dermassist_token')
+        setToken(null)
+        setUser(null)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
-  const register = async ({ full_name, username, email, password, phone_number, gender, date_of_birth }) => {
-    const res = await axios.post(`${API}/auth/register`, {
-      full_name, username, email, password, phone_number, gender, date_of_birth
-    })
-    const { access_token } = res.data
-    localStorage.setItem('dermassist_token', access_token)
-    setToken(access_token)
+  // ── Register ───────────────────────────────────────────────────────────────
+  const register = async (data) => {
+    const res = await axios.post(`${API}/auth/register`, data)
+    const newToken = res.data.access_token
 
-    // Fetch full profile after register
-    const profile = await axios.get(`${API}/user/me`, {
-      headers: { Authorization: `Bearer ${access_token}` }
+    // Fetch full profile after registering
+    const profileRes = await axios.get(`${API}/user/me`, {
+      headers: { Authorization: `Bearer ${newToken}` }
     })
-    setUser(profile.data)
-    return profile.data
+
+    localStorage.setItem('dermassist_token', newToken)
+    setToken(newToken)
+    setUser(profileRes.data)
   }
 
-  const login = async ({ username, password }) => {
-    const form = new URLSearchParams()
-    form.append('username', username)
-    form.append('password', password)
+  // ── Login ──────────────────────────────────────────────────────────────────
+  const login = async (username, password) => {
+    const formData = new FormData()
+    formData.append('username', username)
+    formData.append('password', password)
 
-    const res = await axios.post(`${API}/auth/login`, form, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    const { access_token } = res.data
-    localStorage.setItem('dermassist_token', access_token)
-    setToken(access_token)
+    const res = await axios.post(`${API}/auth/login`, formData)
+    const newToken = res.data.access_token
 
     // Fetch full profile after login
-    const profile = await axios.get(`${API}/user/me`, {
-      headers: { Authorization: `Bearer ${access_token}` }
+    const profileRes = await axios.get(`${API}/user/me`, {
+      headers: { Authorization: `Bearer ${newToken}` }
     })
-    setUser(profile.data)
-    return profile.data
+
+    localStorage.setItem('dermassist_token', newToken)
+    setToken(newToken)
+    setUser(profileRes.data)
   }
 
+  // ── Logout ─────────────────────────────────────────────────────────────────
   const logout = () => {
     localStorage.removeItem('dermassist_token')
     setToken(null)
@@ -71,7 +73,16 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, register, login, logout, isLoggedIn: !!user }}>
+    <AuthContext.Provider value={{
+      user,
+      token,
+      loading,
+      isLoggedIn: !!token && !!user,
+      register,
+      login,
+      logout,
+      setUser,
+    }}>
       {children}
     </AuthContext.Provider>
   )

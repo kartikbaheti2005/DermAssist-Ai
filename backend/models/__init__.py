@@ -7,7 +7,9 @@ ist = pytz.timezone("Asia/Kolkata")
 def ist_now():
     return datetime.now(ist).isoformat()
 
-from .base import Base, ist_now
-from .user import User
-from .images import Image
-from .prediciton import Prediction
+from models.base import Base
+from models.user import User
+from models.images import Image
+from models.prediciton import Prediction
+
+__all__ = ["Base", "User", "Image", "Prediction"]

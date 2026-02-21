@@ -33,7 +33,6 @@
     overflow-x: hidden;
   }
 
-  /* Background grid */
   body::before {
     content: '';
     position: fixed;
@@ -54,7 +53,6 @@
     z-index: 1;
   }
 
-  /* Header */
   .header {
     text-align: center;
     margin-bottom: 64px;
@@ -106,14 +104,13 @@
     line-height: 1.6;
   }
 
-  /* Warning banner */
   .warning {
     background: rgba(245,158,11,0.08);
     border: 1px solid rgba(245,158,11,0.3);
     border-left: 4px solid var(--yellow);
     border-radius: 12px;
     padding: 20px 24px;
-    margin-bottom: 48px;
+    margin-bottom: 24px;
     display: flex;
     gap: 16px;
     align-items: flex-start;
@@ -121,21 +118,27 @@
   }
 
   .warning-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-
   .warning strong { color: var(--yellow); display: block; margin-bottom: 6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
-
   .warning p { color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; }
+  .warning code { font-family: var(--mono); background: rgba(245,158,11,0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: var(--yellow); }
 
-  .warning code {
-    font-family: var(--mono);
-    background: rgba(245,158,11,0.15);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    color: var(--yellow);
+  .info-box {
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    animation: fadeIn 0.6s 0.25s ease both;
   }
 
-  /* Phase sections */
+  .info-box strong { color: var(--accent); display: block; margin-bottom: 6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .info-box p { color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; }
+  .info-box code { font-family: var(--mono); background: rgba(0,212,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: var(--accent); }
+
   .phase {
     margin-bottom: 48px;
     animation: fadeIn 0.5s ease both;
@@ -158,14 +161,14 @@
     flex-shrink: 0;
   }
 
-  .phase-number.blue { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
-  .phase-number.purple { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
-  .phase-number.green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .phase-number.blue   { background: rgba(0,212,255,0.15);  color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .phase-number.purple { background: rgba(124,58,237,0.15); color: #a78bfa;       border: 1px solid rgba(124,58,237,0.3); }
+  .phase-number.green  { background: rgba(16,185,129,0.15); color: var(--green);  border: 1px solid rgba(16,185,129,0.3); }
+  .phase-number.yellow { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
 
   .phase-title { font-size: 1.3rem; font-weight: 700; }
-  .phase-desc { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+  .phase-desc  { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
 
-  /* Step cards */
   .steps { display: flex; flex-direction: column; gap: 16px; }
 
   .step {
@@ -176,10 +179,7 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .step:hover {
-    border-color: rgba(0,212,255,0.2);
-    box-shadow: 0 0 30px rgba(0,212,255,0.05);
-  }
+  .step:hover { border-color: rgba(0,212,255,0.2); box-shadow: 0 0 30px rgba(0,212,255,0.05); }
 
   .step-header {
     display: flex;
@@ -200,44 +200,23 @@
   }
 
   .step-label { font-weight: 600; font-size: 0.95rem; flex: 1; }
-  .step-tag {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-weight: 600;
-  }
+  .step-tag { font-family: var(--mono); font-size: 0.7rem; padding: 3px 10px; border-radius: 100px; font-weight: 600; }
 
-  .tag-required { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
-  .tag-backend { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
-  .tag-frontend { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+  .tag-required { background: rgba(239,68,68,0.15);   color: #f87171;    border: 1px solid rgba(239,68,68,0.25); }
+  .tag-backend  { background: rgba(0,212,255,0.1);    color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .tag-frontend { background: rgba(124,58,237,0.1);  color: #a78bfa;    border: 1px solid rgba(124,58,237,0.2); }
   .tag-optional { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.2); }
-  .tag-done { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+  .tag-done     { background: rgba(16,185,129,0.1);  color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+  .tag-new      { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
 
-  .step-chevron {
-    color: var(--muted);
-    transition: transform 0.3s;
-    font-size: 18px;
-  }
-
+  .step-chevron { color: var(--muted); transition: transform 0.3s; font-size: 18px; }
   .step.open .step-chevron { transform: rotate(180deg); }
 
-  .step-body {
-    display: none;
-    padding: 0 20px 20px;
-    border-top: 1px solid var(--border);
-  }
-
+  .step-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
   .step.open .step-body { display: block; }
 
-  .step-info {
-    padding: 16px 0 12px;
-    color: #94a3b8;
-    font-size: 0.88rem;
-    line-height: 1.7;
-  }
+  .step-info { padding: 16px 0 12px; color: #94a3b8; font-size: 0.88rem; line-height: 1.7; }
 
-  /* Code blocks */
   .code-block {
     background: #070d19;
     border: 1px solid #1a2640;
@@ -254,13 +233,7 @@
     border-bottom: 1px solid #1a2640;
   }
 
-  .code-label {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
+  .code-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 
   .copy-btn {
     background: rgba(0,212,255,0.1);
@@ -273,7 +246,6 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
   }
-
   .copy-btn:hover { background: rgba(0,212,255,0.2); }
   .copy-btn:active { transform: scale(0.97); }
   .copy-btn.copied { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.1); }
@@ -289,12 +261,12 @@
   }
 
   .code-content .comment { color: #3d5a80; }
-  .code-content .cmd { color: var(--accent); }
-  .code-content .flag { color: #a78bfa; }
-  .code-content .str { color: #34d399; }
-  .code-content .path { color: #fb923c; }
+  .code-content .cmd     { color: var(--accent); }
+  .code-content .flag    { color: #a78bfa; }
+  .code-content .str     { color: #34d399; }
+  .code-content .path    { color: #fb923c; }
+  .code-content .warn    { color: var(--yellow); }
 
-  /* Divider */
   .divider {
     display: flex;
     align-items: center;
@@ -306,14 +278,8 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* Result box */
   .result-box {
     background: rgba(16,185,129,0.05);
     border: 1px solid rgba(16,185,129,0.2);
@@ -326,7 +292,6 @@
     line-height: 1.8;
   }
 
-  /* Architecture diagram */
   .arch {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -337,20 +302,12 @@
     animation: fadeIn 0.6s 0.4s ease both;
   }
 
-  .arch h3 {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 28px;
-    font-family: var(--mono);
-  }
+  .arch h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 28px; font-family: var(--mono); }
 
   .arch-flow {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
     flex-wrap: wrap;
     gap: 8px;
   }
@@ -360,32 +317,18 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 14px 20px;
-    min-width: 120px;
+    min-width: 110px;
     text-align: center;
   }
 
-  .arch-node .node-icon { font-size: 22px; margin-bottom: 6px; }
+  .arch-node .node-icon  { font-size: 22px; margin-bottom: 6px; }
   .arch-node .node-label { font-size: 0.78rem; font-weight: 600; color: var(--text); }
-  .arch-node .node-sub { font-size: 0.68rem; color: var(--muted); font-family: var(--mono); margin-top: 4px; }
+  .arch-node .node-sub   { font-size: 0.68rem; color: var(--muted); font-family: var(--mono); margin-top: 4px; }
+  .arch-node.highlighted { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.06); }
 
-  .arch-node.highlighted {
-    border-color: rgba(0,212,255,0.3);
-    background: rgba(0,212,255,0.06);
-  }
+  .arch-arrow { color: var(--muted); font-size: 20px; flex-shrink: 0; }
 
-  .arch-arrow {
-    color: var(--muted);
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-
-  /* URLs */
-  .url-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 12px;
-  }
+  .url-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
 
   .url-card {
     background: var(--surface2);
@@ -397,13 +340,11 @@
     gap: 12px;
   }
 
-  .url-card .url-icon { font-size: 22px; }
-
+  .url-card .url-icon  { font-size: 22px; }
   .url-card .url-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
-  .url-card .url-link { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); text-decoration: none; }
+  .url-card .url-link  { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); text-decoration: none; }
   .url-card .url-link:hover { text-decoration: underline; }
 
-  /* Troubleshoot */
   .trouble-item {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -418,40 +359,13 @@
   .trouble-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
   .trouble-q { font-weight: 600; font-size: 0.88rem; color: #f87171; margin-bottom: 6px; }
   .trouble-a { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; }
-  .trouble-a code {
-    font-family: var(--mono);
-    background: rgba(0,212,255,0.08);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--accent);
-    font-size: 0.85em;
-  }
+  .trouble-a code { font-family: var(--mono); background: rgba(0,212,255,0.08); padding: 2px 6px; border-radius: 4px; color: var(--accent); font-size: 0.85em; }
 
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 80px;
-    padding-top: 40px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.8rem;
-  }
+  .footer { text-align: center; margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; }
 
-  /* Animations */
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .phase:nth-child(1) { animation-delay: 0.1s; }
   .phase:nth-child(2) { animation-delay: 0.2s; }
@@ -459,22 +373,39 @@
 </style>
 </head>
 <body>
-
 <div class="container">
 
   <!-- Header -->
   <div class="header">
-    <div class="badge">Setup Guide</div>
+    <div class="badge">Setup Guide v2.0</div>
     <h1>Running <span>DermAssist AI</span><br>Step by Step</h1>
-    <p class="subtitle">Full-stack setup: FastAPI backend + React frontend.<br>Follow each step in order — takes about 5–10 minutes.</p>
+    <p class="subtitle">Full-stack setup: FastAPI backend + SQLite database + React frontend.<br>Follow each phase in order — takes about 10–15 minutes.</p>
   </div>
 
-  <!-- Warning -->
+  <!-- Model warning -->
   <div class="warning">
     <div class="warning-icon">⚠️</div>
     <div>
-      <strong>Before You Start — Model File Required</strong>
-      <p>The AI model is <strong>not included</strong> in the zip. You must copy <code>skin_cancer_model.tflite</code> into the <code>backend/</code> folder before running the backend, or the prediction endpoint won't work.</p>
+      <strong>Model File Required</strong>
+      <p>The AI model is <strong>not included</strong> in the repo. You must copy <code>best_skin_cancer_model.h5</code> into the <code>backend/</code> folder before running, or the prediction endpoint won't work.</p>
+    </div>
+  </div>
+
+  <!-- DB warning -->
+  <div class="warning">
+    <div class="warning-icon">🗄️</div>
+    <div>
+      <strong>Fresh Database Required</strong>
+      <p>If you have an old <code>dermassist.db</code> from a previous version, <strong>delete it</strong> before starting. The backend will create a fresh one automatically with all the correct columns.</p>
+    </div>
+  </div>
+
+  <!-- Auth info -->
+  <div class="info-box">
+    <div style="font-size:24px;flex-shrink:0;margin-top:2px">🔐</div>
+    <div>
+      <strong>Authentication Included</strong>
+      <p>This version includes full user authentication — register, login, JWT tokens, and scan history. When you open the app for the first time you'll be redirected to the register page automatically. After registering, you stay logged in for 24 hours.</p>
     </div>
   </div>
 
@@ -485,7 +416,7 @@
       <div class="arch-node">
         <div class="node-icon">🌐</div>
         <div class="node-label">Browser</div>
-        <div class="node-sub">localhost:5173</div>
+        <div class="node-sub">localhost:3000</div>
       </div>
       <div class="arch-arrow">→</div>
       <div class="arch-node highlighted">
@@ -497,7 +428,7 @@
       <div class="arch-node">
         <div class="node-icon">🔌</div>
         <div class="node-label">POST /predict</div>
-        <div class="node-sub">multipart/form-data</div>
+        <div class="node-sub">+ Bearer token</div>
       </div>
       <div class="arch-arrow">→</div>
       <div class="arch-node highlighted">
@@ -508,8 +439,14 @@
       <div class="arch-arrow">→</div>
       <div class="arch-node">
         <div class="node-icon">🧠</div>
-        <div class="node-label">TFLite Model</div>
-        <div class="node-sub">.tflite inference</div>
+        <div class="node-label">Keras H5 Model</div>
+        <div class="node-sub">224×224 input</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="node-icon">🗄️</div>
+        <div class="node-label">SQLite DB</div>
+        <div class="node-sub">dermassist.db</div>
       </div>
     </div>
   </div>
@@ -525,26 +462,26 @@
     </div>
 
     <div class="steps">
+
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">🐍</div>
-          <div class="step-label">Python 3.9 – 3.11</div>
+          <div class="step-label">Python 3.10 or 3.11</div>
           <span class="step-tag tag-required">Required</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">TensorFlow requires Python 3.9, 3.10, or 3.11. Python 3.12+ is NOT supported by tensorflow-cpu yet.</div>
+          <div class="step-info">TensorFlow works best on Python 3.10 or 3.11. Python 3.12+ may have compatibility issues.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Check version</span>
               <button class="copy-btn" onclick="copyCode(this, 'python --version')">Copy</button>
             </div>
-            <div class="code-content"><span class="comment"># Check your Python version — should be 3.9, 3.10, or 3.11</span>
-<span class="cmd">python --version</span>
-
-<span class="comment"># Download from: https://python.org/downloads</span>
-<span class="comment"># ✅ OK:   Python 3.9.x / 3.10.x / 3.11.x</span>
-<span class="comment"># ❌ FAIL: Python 3.12+ (TensorFlow not supported yet)</span></div>
+            <div class="code-content"><span class="cmd">python --version</span>
+<span class="comment"># ✅ OK:   Python 3.10.x or 3.11.x
+# ⚠️  OK:  Python 3.9.x (works but not recommended)
+# ❌ FAIL: Python 3.12+ (may have TF issues)
+# Download from: https://python.org/downloads</span></div>
           </div>
         </div>
       </div>
@@ -557,15 +494,15 @@
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Node.js is needed to install and run the React frontend with Vite.</div>
+          <div class="step-info">Node.js is needed to run the React frontend with Vite. Download the LTS version from nodejs.org.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Check version</span>
               <button class="copy-btn" onclick="copyCode(this, 'node --version')">Copy</button>
             </div>
             <div class="code-content"><span class="cmd">node --version</span>
-<span class="comment"># Should print v18.x.x or higher</span>
-<span class="comment"># Download from: https://nodejs.org (LTS version)</span></div>
+<span class="comment"># Should print v18.x.x or higher
+# Download from: https://nodejs.org (choose LTS)</span></div>
           </div>
         </div>
       </div>
@@ -573,27 +510,37 @@
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">🗂️</div>
-          <div class="step-label">Unzip the project</div>
+          <div class="step-label">Project folder structure</div>
           <span class="step-tag tag-required">Required</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Extract the zip file you downloaded. You'll get a folder called <code style="font-family:monospace;color:#00d4ff">DermAssist-AI/</code> with two subfolders inside.</div>
+          <div class="step-info">Make sure your folder looks like this before starting. The model file must be added manually.</div>
           <div class="code-block">
-            <div class="code-top">
-              <span class="code-label">Expected structure</span>
-            </div>
+            <div class="code-top"><span class="code-label">Expected structure</span></div>
             <div class="code-content"><span class="path">DermAssist-AI/</span>
 ├── <span class="path">backend/</span>
 │   ├── <span class="str">main.py</span>
+│   ├── <span class="str">auth.py</span>
+│   ├── <span class="str">database.py</span>
 │   ├── <span class="str">requirements.txt</span>
-│   └── <span class="comment">← ADD skin_cancer_model.tflite HERE</span>
+│   ├── <span class="warn">best_skin_cancer_model.h5</span>  <span class="comment">← ADD THIS MANUALLY</span>
+│   └── <span class="path">models/</span>
+│       ├── <span class="str">__init__.py</span>
+│       ├── <span class="str">base.py</span>
+│       ├── <span class="str">user.py</span>
+│       ├── <span class="str">images.py</span>
+│       └── <span class="str">prediciton.py</span>  <span class="comment">← note: typo in filename is intentional</span>
 └── <span class="path">frontend/</span>
     ├── <span class="str">package.json</span>
-    └── <span class="str">src/</span></div>
+    └── <span class="path">src/</span>
+        ├── <span class="path">context/</span>  AuthContext.jsx
+        ├── <span class="path">pages/</span>   Home, Login, Register, Profile...
+        └── <span class="path">components/</span></div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -605,11 +552,12 @@
       <div class="phase-number blue">01</div>
       <div>
         <div class="phase-title">Set Up the Backend</div>
-        <div class="phase-desc">FastAPI server — run in Terminal 1</div>
+        <div class="phase-desc">FastAPI server + database — run in Terminal 1</div>
       </div>
     </div>
 
     <div class="steps">
+
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">📁</div>
@@ -618,10 +566,10 @@
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Open your terminal (Command Prompt, PowerShell, or Terminal on Mac/Linux) and cd into the backend folder.</div>
+          <div class="step-info">Open your terminal (PowerShell on Windows, Terminal on Mac/Linux) and navigate to the backend folder.</div>
           <div class="code-block">
             <div class="code-top">
-              <span class="code-label">Windows / Mac / Linux</span>
+              <span class="code-label">Navigate</span>
               <button class="copy-btn" onclick="copyCode(this, 'cd DermAssist-AI/backend')">Copy</button>
             </div>
             <div class="code-content"><span class="cmd">cd DermAssist-AI/backend</span></div>
@@ -632,15 +580,15 @@
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">🏗️</div>
-          <div class="step-label">Create a virtual environment</div>
+          <div class="step-label">Create & activate virtual environment</div>
           <span class="step-tag tag-backend">Backend</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">A virtual environment keeps your Python packages isolated from other projects. Highly recommended.</div>
+          <div class="step-info">A virtual environment keeps your Python packages isolated. If a <code style="font-family:monospace;color:#00d4ff">venv/</code> folder already exists, just activate it — skip the create step.</div>
           <div class="code-block">
             <div class="code-top">
-              <span class="code-label">Windows (PowerShell / CMD)</span>
+              <span class="code-label">Windows (PowerShell)</span>
               <button class="copy-btn" onclick="copyCode(this, 'python -m venv venv\nvenv\\Scripts\\activate')">Copy</button>
             </div>
             <div class="code-content"><span class="cmd">python -m venv venv</span>
@@ -653,8 +601,7 @@
               <button class="copy-btn" onclick="copyCode(this, 'python3 -m venv venv\nsource venv/bin/activate')">Copy</button>
             </div>
             <div class="code-content"><span class="cmd">python3 -m venv venv</span>
-<span class="cmd">source venv/bin/activate</span>
-<span class="comment"># You should see (venv) appear before your prompt</span></div>
+<span class="cmd">source venv/bin/activate</span></div>
           </div>
         </div>
       </div>
@@ -667,7 +614,7 @@
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">This installs FastAPI, TensorFlow (CPU), OpenCV, and other libraries. TensorFlow is large — may take 2–5 minutes depending on your internet speed.</div>
+          <div class="step-info">This installs FastAPI, TensorFlow, OpenCV, SQLAlchemy, and all auth packages. TensorFlow is large — may take 3–5 minutes.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Install all packages</span>
@@ -676,40 +623,96 @@
             <div class="code-content"><span class="cmd">pip install -r requirements.txt</span>
 <span class="comment">
 # Installs:
-#  fastapi           — web framework
-#  uvicorn           — ASGI server
-#  tensorflow-cpu    — AI inference (no GPU needed)
-#  opencv-python     — image preprocessing
-#  pillow            — image handling
-#  python-multipart  — file upload support</span></div>
+#  fastapi              — web framework
+#  uvicorn              — ASGI server
+#  tensorflow           — AI model (Keras H5)
+#  opencv-python        — image preprocessing (resize, normalize)
+#  sqlalchemy           — database ORM
+#  python-jose          — JWT token creation & verification
+#  passlib              — password hashing wrapper
+#  pytz                 — IST timezone for timestamps
+#  python-multipart     — file upload support</span></div>
           </div>
         </div>
       </div>
 
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
-          <div class="step-icon">🧠</div>
-          <div class="step-label">Add the model file</div>
+          <div class="step-icon">🔑</div>
+          <div class="step-label">Fix bcrypt version (IMPORTANT)</div>
           <span class="step-tag tag-required">Required</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Copy your <strong>skin_cancer_model.tflite</strong> file into the <code style="font-family:monospace;color:#00d4ff">backend/</code> folder. The server looks for it in the same directory as main.py.</div>
+          <div class="step-info">The latest bcrypt (v5+) is incompatible with passlib and will cause registration to fail silently. You must downgrade it to v4.0.1 after installing requirements.</div>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">Downgrade bcrypt</span>
+              <button class="copy-btn" onclick="copyCode(this, 'pip install bcrypt==4.0.1 --force-reinstall')">Copy</button>
+            </div>
+            <div class="code-content"><span class="cmd">pip install bcrypt==4.0.1 <span class="flag">--force-reinstall</span></span>
+
+<span class="comment"># Verify it worked:</span>
+<span class="cmd">python -c "import bcrypt; print(bcrypt.__version__)"</span>
+<span class="comment"># Should print: 4.0.1</span></div>
+          </div>
+          <div class="result-box">✅ Expected output:
+4.0.1</div>
+        </div>
+      </div>
+
+      <div class="step" onclick="toggle(this)">
+        <div class="step-header">
+          <div class="step-icon">🧠</div>
+          <div class="step-label">Add the AI model file</div>
+          <span class="step-tag tag-required">Required</span>
+          <div class="step-chevron">⌄</div>
+        </div>
+        <div class="step-body">
+          <div class="step-info">Copy <strong>best_skin_cancer_model.h5</strong> into the <code style="font-family:monospace;color:#00d4ff">backend/</code> folder. This is a Keras H5 model trained on 224×224 images. The server looks for it in the same folder as main.py.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Verify the file is there</span>
-              <button class="copy-btn" onclick="copyCode(this, 'ls -la')">Copy</button>
             </div>
-            <div class="code-content"><span class="comment"># On Windows:</span>
+            <div class="code-content"><span class="comment"># Windows:</span>
 <span class="cmd">dir</span>
 
-<span class="comment"># On Mac/Linux:</span>
+<span class="comment"># Mac/Linux:</span>
 <span class="cmd">ls -la</span>
 
-<span class="comment"># You should see:</span>
+<span class="comment"># You must see:</span>
+<span class="str">best_skin_cancer_model.h5</span>  <span class="comment">← must exist!</span>
 <span class="str">main.py</span>
-<span class="str">requirements.txt</span>
-<span class="str">skin_cancer_model.tflite</span>  <span class="comment">← this must exist!</span></div>
+<span class="str">auth.py</span>
+<span class="str">database.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" onclick="toggle(this)">
+        <div class="step-header">
+          <div class="step-icon">🗄️</div>
+          <div class="step-label">Database setup (auto)</div>
+          <span class="step-tag tag-new">Auto</span>
+          <div class="step-chevron">⌄</div>
+        </div>
+        <div class="step-body">
+          <div class="step-info">The database (<code style="font-family:monospace;color:#00d4ff">dermassist.db</code>) is created automatically when the backend starts for the first time. No manual setup needed. If you have an old one, delete it first.</div>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">Delete old database (if exists)</span>
+              <button class="copy-btn" onclick="copyCode(this, 'del dermassist.db')">Copy</button>
+            </div>
+            <div class="code-content"><span class="comment"># Windows — delete old database:</span>
+<span class="cmd">del dermassist.db</span>
+
+<span class="comment"># Mac/Linux:</span>
+<span class="cmd">rm dermassist.db</span>
+
+<span class="comment"># The backend will auto-create a fresh one with these tables:
+#   users       — stores accounts (name, email, password_hash, dob...)
+#   images      — stores info about uploaded images
+#   predictions — stores every AI scan result</span></div>
           </div>
         </div>
       </div>
@@ -722,7 +725,7 @@
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">This starts the FastAPI server on port 8000. Keep this terminal open while using the app.</div>
+          <div class="step-info">Start the FastAPI server on port 8000. Keep this terminal open the entire time you use the app.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Start server</span>
@@ -732,13 +735,13 @@
           </div>
           <div class="result-box">✅ Expected output:
 
-INFO:     Will watch for changes in these directories: ['...']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [...] using WatchFiles
+INFO:     Will watch for changes in these directories: [...]
+INFO:     Uvicorn running on http://127.0.0.1:8000
 ✅ Model loaded successfully.
 INFO:     Application startup complete.</div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -755,6 +758,7 @@ INFO:     Application startup complete.</div>
     </div>
 
     <div class="steps">
+
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">📁</div>
@@ -763,7 +767,7 @@ INFO:     Application startup complete.</div>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">⚠️ Keep the backend terminal from Phase 1 running! Open a <strong>second</strong> terminal window and navigate to the frontend folder.</div>
+          <div class="step-info">⚠️ Keep the backend terminal running! Open a <strong>second</strong> terminal and navigate to the frontend folder.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">New terminal</span>
@@ -782,7 +786,7 @@ INFO:     Application startup complete.</div>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">This installs React, Vite, Tailwind CSS, Framer Motion, and all other frontend packages. Only needs to be done once.</div>
+          <div class="step-info">Installs React, Vite, Tailwind CSS, Framer Motion, Axios, and all other packages. Only needed once — if <code style="font-family:monospace;color:#00d4ff">node_modules/</code> already exists, skip this.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Install packages</span>
@@ -790,9 +794,14 @@ INFO:     Application startup complete.</div>
             </div>
             <div class="code-content"><span class="cmd">npm install</span>
 <span class="comment">
-# Creates node_modules/ folder
-# Installs: react, react-router-dom, axios,
-#           framer-motion, lucide-react, tailwindcss, vite</span></div>
+# Installs:
+#  react + react-dom       — UI framework
+#  react-router-dom        — page routing + auth guards
+#  axios                   — API calls with JWT headers
+#  framer-motion           — animations
+#  lucide-react            — icons
+#  tailwindcss             — styling
+#  vite                    — dev server + bundler</span></div>
           </div>
         </div>
       </div>
@@ -805,7 +814,7 @@ INFO:     Application startup complete.</div>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">This starts the Vite development server with hot-module replacement. Changes you make to files appear instantly in the browser.</div>
+          <div class="step-info">Starts the Vite development server. The app runs on port 3000. Changes to files appear instantly in the browser.</div>
           <div class="code-block">
             <div class="code-top">
               <span class="code-label">Start dev server</span>
@@ -815,12 +824,12 @@ INFO:     Application startup complete.</div>
           </div>
           <div class="result-box">✅ Expected output:
 
-  VITE v5.x.x  ready in 312 ms
+  VITE v5.x.x  ready in 705 ms
 
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose</div>
+  ➜  Local:   http://localhost:3000/</div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -837,6 +846,7 @@ INFO:     Application startup complete.</div>
     </div>
 
     <div class="steps">
+
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">🌐</div>
@@ -845,13 +855,13 @@ INFO:     Application startup complete.</div>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Open these URLs in any modern browser (Chrome, Firefox, Edge). Make sure both terminals are still running.</div>
+          <div class="step-info">Open these URLs in any modern browser. Both servers must still be running.</div>
           <div class="url-cards">
             <div class="url-card">
               <div class="url-icon">⚛️</div>
               <div>
                 <div class="url-label">React App (Frontend)</div>
-                <a class="url-link" href="http://localhost:5173" target="_blank">http://localhost:5173</a>
+                <a class="url-link" href="http://localhost:3000" target="_blank">http://localhost:3000</a>
               </div>
             </div>
             <div class="url-card">
@@ -867,23 +877,76 @@ INFO:     Application startup complete.</div>
 
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
+          <div class="step-icon">🔐</div>
+          <div class="step-label">Register your account</div>
+          <span class="step-tag tag-new">Auth</span>
+          <div class="step-chevron">⌄</div>
+        </div>
+        <div class="step-body">
+          <div class="step-info">The app automatically redirects new users to the registration page. Fill in all required fields.</div>
+          <div class="code-block">
+            <div class="code-top"><span class="code-label">Registration checklist</span></div>
+            <div class="code-content"><span class="str">Required fields:</span>
+  Full Name, Username, Email, Password, Date of Birth
+
+<span class="str">Optional fields:</span>
+  Phone Number, Gender
+
+<span class="comment"># After registering:
+# → You'll be automatically logged in
+# → Redirected to the home page
+# → Your name appears in the top-right navbar
+# → Token saved for 24 hours (auto-login on return)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" onclick="toggle(this)">
+        <div class="step-header">
           <div class="step-icon">🧪</div>
-          <div class="step-label">Test the full flow</div>
+          <div class="step-label">Test image analysis</div>
           <span class="step-tag tag-done">Test</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">Follow these steps to do a full end-to-end test of the application.</div>
+          <div class="step-info">Upload a skin lesion image to test the full AI pipeline.</div>
           <div class="code-block">
             <div class="code-top"><span class="code-label">Test checklist</span></div>
-            <div class="code-content"><span class="str">1.</span> Go to <span class="cmd">http://localhost:5173</span>
-<span class="str">2.</span> You should see the DermAssist AI homepage with hero section
-<span class="str">3.</span> Scroll down to the Image Upload section
-<span class="str">4.</span> Drag & drop a skin image (JPEG or PNG) or click "Choose File"
-<span class="str">5.</span> Click the <span class="str">"Analyze Image"</span> button
-<span class="str">6.</span> Watch the 4-step processing animation
-<span class="str">7.</span> See the Result Card showing Risk Level + Confidence
-<span class="str">8.</span> See the Recommendation Panel below the result</div>
+            <div class="code-content"><span class="str">1.</span> Go to the home page
+<span class="str">2.</span> Upload a skin image (JPEG or PNG)
+<span class="str">3.</span> Click <span class="str">"Analyze Image with AI"</span>
+<span class="str">4.</span> Watch the processing animation (~5 seconds)
+<span class="str">5.</span> Read the risk assessment message
+<span class="str">6.</span> Check your profile → Scan History tab
+<span class="str">7.</span> The scan should appear there automatically ✅</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" onclick="toggle(this)">
+        <div class="step-header">
+          <div class="step-icon">👤</div>
+          <div class="step-label">Check your profile & history</div>
+          <span class="step-tag tag-new">New</span>
+          <div class="step-chevron">⌄</div>
+        </div>
+        <div class="step-body">
+          <div class="step-info">Click your name in the top-right corner to open the dropdown, then click "My Profile".</div>
+          <div class="code-block">
+            <div class="code-top"><span class="code-label">Profile page features</span></div>
+            <div class="code-content"><span class="str">Profile tab:</span>
+  Name, username, email, date of birth,
+  phone number, gender, member since
+
+<span class="str">Scan History tab:</span>
+  All previous scans with:
+  → Diagnosis name
+  → Risk level (High / Moderate / Low)
+  → AI confidence %
+  → Date & time of scan
+
+<span class="str">Stats at top:</span>
+  Total scans, High risk findings, Safe results</div>
           </div>
         </div>
       </div>
@@ -891,27 +954,46 @@ INFO:     Application startup complete.</div>
       <div class="step" onclick="toggle(this)">
         <div class="step-header">
           <div class="step-icon">🔒</div>
-          <div class="step-label">Shutting down the servers</div>
+          <div class="step-label">Shutting down</div>
           <span class="step-tag tag-optional">When done</span>
           <div class="step-chevron">⌄</div>
         </div>
         <div class="step-body">
-          <div class="step-info">When you're done using the app, stop both servers by pressing Ctrl+C in each terminal window.</div>
+          <div class="step-info">When done, press Ctrl+C in both terminal windows to stop the servers.</div>
           <div class="code-block">
-            <div class="code-top"><span class="code-label">Stop servers</span></div>
-            <div class="code-content"><span class="comment"># In Terminal 1 (backend):</span>
+            <div class="code-top"><span class="code-label">Stop both servers</span></div>
+            <div class="code-content"><span class="comment"># Terminal 1 (backend) + Terminal 2 (frontend):</span>
 <span class="flag">Ctrl + C</span>
 
-<span class="comment"># In Terminal 2 (frontend):</span>
-<span class="flag">Ctrl + C</span></div>
+<span class="comment"># Next time you want to run again:
+# 1. cd backend → activate venv → uvicorn main:app --reload --host 127.0.0.1 --port 8000
+# 2. cd frontend → npm run dev
+# No reinstalling needed!</span></div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
   <!-- Troubleshooting -->
   <div class="divider">Troubleshooting</div>
+
+  <div class="trouble-item">
+    <div class="trouble-icon">🔴</div>
+    <div>
+      <div class="trouble-q">"Registration failed. Please try again."</div>
+      <div class="trouble-a">Almost always a bcrypt version issue. Run: <code>pip install bcrypt==4.0.1 --force-reinstall</code> then restart the backend. Also delete <code>dermassist.db</code> and let it recreate fresh.</div>
+    </div>
+  </div>
+
+  <div class="trouble-item">
+    <div class="trouble-icon">🔴</div>
+    <div>
+      <div class="trouble-q">"Inference failed: Input shape mismatch (expected 224×224)"</div>
+      <div class="trouble-a">The preprocessing code is still using the old 128×128 size. In <code>backend/main.py</code>, find <code>cv2.resize(img, (128, 128))</code> and change it to <code>cv2.resize(img, (224, 224))</code>.</div>
+    </div>
+  </div>
 
   <div class="trouble-item">
     <div class="trouble-icon">🔴</div>
@@ -924,44 +1006,52 @@ INFO:     Application startup complete.</div>
   <div class="trouble-item">
     <div class="trouble-icon">🔴</div>
     <div>
-      <div class="trouble-q">"Model not loaded" error when uploading</div>
-      <div class="trouble-a">The <code>skin_cancer_model.tflite</code> file is missing from the <code>backend/</code> folder. Copy it there and restart the server.</div>
+      <div class="trouble-q">Model not loading — "WARNING: Model file not found"</div>
+      <div class="trouble-a">The <code>best_skin_cancer_model.h5</code> file is missing from the <code>backend/</code> folder. Copy it there and restart the server. Filename must match exactly.</div>
     </div>
   </div>
 
   <div class="trouble-item">
     <div class="trouble-icon">🔴</div>
     <div>
-      <div class="trouble-q">pip install fails on TensorFlow</div>
-      <div class="trouble-a">Check your Python version with <code>python --version</code>. Must be 3.9, 3.10, or 3.11. On some systems use <code>pip3</code> instead of <code>pip</code>. Also try: <code>pip install tensorflow-cpu --upgrade</code></div>
+      <div class="trouble-q">"No module named 'sqlalchemy'" or "No module named 'jose'"</div>
+      <div class="trouble-a">Your virtual environment is not activated. Run <code>venv\Scripts\activate</code> (Windows) or <code>source venv/bin/activate</code> (Mac), then <code>pip install -r requirements.txt</code> again.</div>
     </div>
   </div>
 
   <div class="trouble-item">
     <div class="trouble-icon">🔴</div>
     <div>
-      <div class="trouble-q">npm install fails or "node not found"</div>
-      <div class="trouble-a">Install Node.js from <code>nodejs.org</code> (choose the LTS version). After installing, close and reopen your terminal, then try again.</div>
+      <div class="trouble-q">"No module named 'models.predictions'"</div>
+      <div class="trouble-a">The prediction model file has a typo in its name — it's <code>prediciton.py</code> (missing 's'). In <code>models/__init__.py</code>, make sure it says <code>from .prediciton import Prediction</code> (matching the actual filename).</div>
     </div>
   </div>
 
   <div class="trouble-item">
     <div class="trouble-icon">🔴</div>
     <div>
-      <div class="trouble-q">Port 8000 already in use</div>
-      <div class="trouble-a">Another app is using port 8000. Stop it or use a different port: <code>uvicorn main:app --reload --port 8001</code> — but then also update the URL in <code>frontend/src/pages/Home.jsx</code> from <code>8000</code> to <code>8001</code>.</div>
+      <div class="trouble-q">Scan history not showing after analyzing an image</div>
+      <div class="trouble-a">Make sure you are logged in before analyzing. The scan is only saved to the database when a valid JWT token is sent with the request. Try logging out and back in, then analyze again.</div>
+    </div>
+  </div>
+
+  <div class="trouble-item">
+    <div class="trouble-icon">🔴</div>
+    <div>
+      <div class="trouble-q">Frontend shows "Failed to resolve import ProfilePage"</div>
+      <div class="trouble-a">The <code>ProfilePage.jsx</code> file is missing. Copy it to <code>frontend/src/pages/ProfilePage.jsx</code>. Vite will reload automatically.</div>
     </div>
   </div>
 
   <div class="footer">
     <p>DermAssist AI — For educational and screening purposes only. Not a medical diagnosis tool.</p>
+    <p style="margin-top:8px;font-family:var(--mono);font-size:0.75rem;">Backend: FastAPI + TensorFlow + SQLite &nbsp;|&nbsp; Frontend: React + Vite + Tailwind</p>
   </div>
 
 </div>
 
 <script>
   function toggle(el) {
-    // Don't toggle when clicking copy button
     if (event.target.classList.contains('copy-btn')) return;
     el.classList.toggle('open');
   }
