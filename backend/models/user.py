@@ -189,6 +189,12 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    health_records = relationship(
+        "HealthRecord",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
     # -------------------------
     # Password Helpers
     # -------------------------
