@@ -1,0 +1,253 @@
+DermAssist AI – Future API Improvement & Endpoint Roadmap
+
+Version: 2.0
+Status: Living Engineering Document
+Purpose: Track all backend endpoints required for future frontend features and backend improvements.
+
+Phase 4 — Core APIs (Highest Priority)
+Authentication
+Existing
+POST /auth/register
+POST /auth/login
+POST /auth/forgot-password
+POST /auth/reset-password
+Required
+POST /auth/logout
+POST /auth/refresh-token
+GET  /auth/me
+POST /auth/change-password
+POST /auth/resend-verification
+POST /auth/verify-email
+Dashboard
+Required
+GET /dashboard/summary
+GET /dashboard/activity
+GET /dashboard/alerts
+GET /dashboard/health-score
+GET /dashboard/recent-scans
+GET /dashboard/upcoming-appointments
+User Profile
+GET    /users/me
+PUT    /users/me
+PUT    /users/avatar
+DELETE /users/avatar
+DELETE /users/account
+Doctors
+Existing
+GET /doctors
+POST /doctors
+Required
+GET /doctors/{doctor_id}
+GET /doctors/search
+GET /doctors/{doctor_id}/availability
+GET /doctors/{doctor_id}/slots
+GET /doctors/{doctor_id}/calendar
+Appointments
+Existing
+POST   /appointments
+GET    /appointments
+DELETE /appointments/{id}
+Required
+GET /appointments/{id}
+PUT /appointments/{id}/reschedule
+GET /appointments/available-slots/{doctor_id}
+GET /appointments/{id}/timeline
+GET /appointments/{id}/status
+POST /appointments/{id}/check-in
+Queue Module
+Required
+GET  /queue/me
+GET  /queue/status
+GET  /queue/eta
+POST /queue/join
+POST /queue/refresh
+GET  /queue/history
+Prediction
+Existing
+POST /predictions
+GET /predictions
+GET /predictions/{id}
+DELETE /predictions/{id}
+Required
+GET /predictions/{id}/explanation
+GET /predictions/timeline
+GET /predictions/statistics
+GET /predictions/risk-trend
+GET /predictions/{id}/download
+Reports
+Required
+GET /reports
+GET /reports/{id}
+GET /reports/{id}/summary
+GET /reports/{id}/download
+GET /reports/export
+GET /reports/{id}/timeline
+GET /reports/{id}/history
+POST /reports/{id}/share
+GET /reports/{id}/share-link
+GET /reports/compare
+Health Records
+Existing
+
+CRUD Complete
+
+Required
+GET /health-records/trends
+GET /health-records/health-score
+GET /health-records/completeness
+GET /health-records/export
+Images
+Existing
+POST /images
+GET /images
+DELETE /images/{id}
+Required
+GET /images/{id}/metadata
+GET /images/compare
+GET /images/timeline
+GET /images/{id}/download
+AI Assistant
+Context
+GET /assistant/context
+Suggestions
+GET /assistant/suggestions
+GET /assistant/actions
+GET /assistant/context-chips
+Conversations
+GET    /chatbot/conversations
+POST   /chatbot/conversations
+GET    /chatbot/conversations/{id}
+PATCH  /chatbot/conversations/{id}
+DELETE /chatbot/conversations/{id}
+Chat
+POST /assistant/chat
+POST /assistant/follow-ups
+POST /assistant/feedback
+GET  /assistant/history
+DELETE /assistant/history
+POST /assistant/clear-context
+Recommendation
+GET /recommendations/{prediction_id}
+GET /recommendations/history
+GET /recommendations/explanation
+Outbreak Intelligence
+Existing
+GET /outbreak/summary
+GET /outbreak/trending
+GET /outbreak/alerts
+POST /outbreak/generate
+Required
+GET /outbreak/weather
+GET /outbreak/history
+GET /outbreak/heatmap
+GET /outbreak/compare
+GET /outbreak/location
+Notifications
+GET /notifications
+PATCH /notifications/{id}/read
+PATCH /notifications/read-all
+DELETE /notifications/{id}
+Search
+GET /search
+
+Supports:
+
+Doctors
+Reports
+Predictions
+Health Records
+Future Articles
+Analytics
+GET /analytics/system
+GET /analytics/users
+GET /analytics/doctors
+GET /analytics/predictions
+Admin
+GET /admin/users
+GET /admin/reports
+GET /admin/predictions
+GET /admin/statistics
+GET /admin/system-health
+GET /admin/logs
+Doctor Dashboard
+GET /doctor/dashboard
+GET /doctor/patients
+GET /doctor/reports
+GET /doctor/statistics
+GET /doctor/availability
+PUT /doctor/availability
+Preferences
+GET /preferences
+PUT /preferences
+
+Examples:
+
+Theme
+Language
+Units
+Notification Preferences
+Audit Logs
+GET /audit
+
+Tracks:
+
+Login
+Prediction
+Report Download
+Appointment Changes
+Health Record Updates
+System APIs
+GET /system/status
+GET /system/version
+GET /system/features
+Cross-Cutting Backend Standards
+
+Every collection endpoint should support:
+
+Pagination
+?page=1&limit=20
+Sorting
+?sort=name
+?sort=date
+?sort=rating
+?sort=confidence
+Filtering
+?status=
+?risk=
+?city=
+?specialization=
+Search
+?q=melanoma
+Standard Response Format
+{
+  "success": true,
+  "message": "Operation completed successfully.",
+  "data": {},
+  "pagination": {}
+}
+Standard Error Format
+{
+  "success": false,
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Requested resource was not found."
+  }
+}
+Future (Phase 5+)
+AI
+Streaming Responses
+Voice Assistant
+Image-based Chat
+Function Calling
+Doctor Handoff
+Explainable AI
+Infrastructure
+Redis Caching
+Background Jobs
+WebSockets
+Cloud Storage
+API Versioning
+Rate Limiting
+RBAC
+Audit Logging
+Performance Monitoring

@@ -1,9 +1,10 @@
 // ===============================
 // Imports
 // ===============================
+import { NavLink } from "react-router-dom";
 
 import {
-  House,
+  Home,
   ScanLine,
   HeartPulse,
   Stethoscope,
@@ -12,6 +13,7 @@ import {
   Bot,
   Globe2,
   Settings,
+  UsersRound
 } from "lucide-react";
 
 // ===============================
@@ -21,36 +23,44 @@ import {
 const navigationItems = [
   {
     title: "Dashboard",
-    icon: House,
+    icon: Home,
+    path: "/",
   },
   {
     title: "Scan",
     icon: ScanLine,
+    path: "/lesion-tracker",
   },
   {
     title: "Health",
     icon: HeartPulse,
+    path: "/health-records",
   },
   {
     title: "Doctors",
     icon: Stethoscope,
+    path: "/doctors",
   },
   {
     title: "Appointments",
     icon: CalendarDays,
+    path: "/appointments",
   },
   {
     title: "Reports",
     icon: BarChart3,
+    path: "/reports",
   },
   {
     title: "AI Assistant",
     icon: Bot,
+    path: "/assistant",
   },
   {
-    title: "Outbreak",
-    icon: Globe2,
-  },
+    title: "Patient Queue",
+    icon: UsersRound,
+    path: "/queue",
+}
 ];
 
 // ===============================
@@ -73,18 +83,25 @@ const Sidebar = () => {
             return (
               <li key={item.title}>
 
-                <button
-                  className="flex items-center w-full gap-3 rounded-xl px-4 py-3 text-slate-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600"
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex w-full items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                    }`
+                  }
                 >
-
+                
                   <Icon size={20} />
-
+                
                   <span className="font-medium">
                     {item.title}
                   </span>
-
-                </button>
-
+                
+                </NavLink>
+                
               </li>
             );
           })}

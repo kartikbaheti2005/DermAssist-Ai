@@ -1,0 +1,371 @@
+DermAssist AI — Production API Contract v1.0
+
+Status: Final Phase 4 API Contract
+
+Purpose: Official backend API reference for frontend integration.
+
+1. Authentication
+POST   /auth/register
+POST   /auth/login
+POST   /auth/logout
+POST   /auth/refresh-token
+POST   /auth/forgot-password
+POST   /auth/reset-password
+POST   /auth/change-password
+POST   /auth/resend-verification
+POST   /auth/verify-email
+
+GET    /auth/me
+2. Dashboard
+GET    /dashboard/summary
+
+Returns
+
+User overview
+Health score
+Latest prediction
+Latest report
+Recent scans
+Next appointment
+Queue status
+Alerts
+Recommendations
+3. User Profile
+GET    /users/me
+PUT    /users/me
+
+PUT    /users/avatar
+DELETE /users/avatar
+
+DELETE /users/account
+4. Doctors
+GET    /doctors
+POST   /doctors
+
+GET    /doctors/{doctor_id}
+
+GET    /doctors/{doctor_id}/availability
+GET    /doctors/{doctor_id}/slots
+GET    /doctors/{doctor_id}/calendar
+
+Supports
+
+?q=
+?city=
+?specialization=
+?rating=
+?page=
+?limit=
+?sort=
+5. Appointments
+POST   /appointments
+
+GET    /appointments
+GET    /appointments/{appointment_id}
+
+PUT    /appointments/{appointment_id}/reschedule
+
+DELETE /appointments/{appointment_id}
+
+GET    /appointments/available-slots/{doctor_id}
+
+GET    /appointments/{appointment_id}/timeline
+
+POST   /appointments/{appointment_id}/check-in
+6. Smart Queue
+POST   /queue/join
+
+GET    /queue/me
+
+GET    /queue/history
+
+POST   /queue/refresh
+
+Queue response includes
+
+status
+position
+estimated_wait_time
+doctor
+appointment
+7. Health Records
+POST   /health-records
+
+GET    /health-records
+
+GET    /health-records/latest
+
+GET    /health-records/{record_id}
+
+PUT    /health-records/{record_id}
+
+DELETE /health-records/{record_id}
+
+GET    /health-records/trends
+
+GET    /health-records/health-score
+
+GET    /health-records/completeness
+
+GET    /health-records/export
+8. Images
+POST   /images
+
+GET    /images
+
+GET    /images/{image_id}
+
+DELETE /images/{image_id}
+
+GET    /images/{image_id}/metadata
+
+GET    /images/timeline
+
+GET    /images/compare
+
+GET    /images/{image_id}/download
+9. Predictions
+POST   /predictions
+
+GET    /predictions
+
+GET    /predictions/{prediction_id}
+
+DELETE /predictions/{prediction_id}
+
+GET    /predictions/{prediction_id}/explanation
+
+GET    /predictions/timeline
+
+GET    /predictions/statistics
+
+GET    /predictions/risk-trend
+
+GET    /predictions/{prediction_id}/download
+10. Reports
+GET    /reports
+
+GET    /reports/{report_id}
+
+GET    /reports/{report_id}/summary
+
+GET    /reports/{report_id}/timeline
+
+GET    /reports/{report_id}/history
+
+GET    /reports/{report_id}/download
+
+GET    /reports/export
+
+POST   /reports/{report_id}/share
+
+GET    /reports/{report_id}/share-link
+
+GET    /reports/compare
+11. Recommendations
+GET    /recommendations/{prediction_id}
+
+GET    /recommendations/history
+
+GET    /recommendations/explanation
+12. AI Assistant
+Assistant
+GET    /assistant/context
+
+GET    /assistant/suggestions
+
+GET    /assistant/actions
+
+GET    /assistant/context-chips
+
+POST   /assistant/chat
+
+POST   /assistant/follow-ups
+
+POST   /assistant/feedback
+
+GET    /assistant/history
+
+DELETE /assistant/history
+
+POST   /assistant/clear-context
+Conversations
+GET    /chatbot/conversations
+
+POST   /chatbot/conversations
+
+GET    /chatbot/conversations/{conversation_id}
+
+PATCH  /chatbot/conversations/{conversation_id}
+
+DELETE /chatbot/conversations/{conversation_id}
+13. Outbreak Intelligence
+GET    /outbreak/summary
+
+GET    /outbreak/trending
+
+GET    /outbreak/alerts
+
+POST   /outbreak/generate
+
+GET    /outbreak/weather
+
+GET    /outbreak/history
+
+GET    /outbreak/heatmap
+
+GET    /outbreak/compare
+
+GET    /outbreak/location
+14. Notifications
+GET    /notifications
+
+PATCH  /notifications/{notification_id}/read
+
+PATCH  /notifications/read-all
+
+DELETE /notifications/{notification_id}
+15. Search
+GET    /search
+
+Supports
+
+Doctors
+
+Predictions
+
+Reports
+
+Health Records
+
+Articles (future)
+16. User Preferences
+GET    /preferences
+
+PUT    /preferences
+
+Stores
+
+Theme
+
+Language
+
+Units
+
+Notification Settings
+17. Doctor Dashboard
+GET    /doctor/dashboard
+
+GET    /doctor/patients
+
+GET    /doctor/reports
+
+GET    /doctor/statistics
+
+GET    /doctor/availability
+
+PUT    /doctor/availability
+18. Admin
+GET    /admin/users
+
+GET    /admin/reports
+
+GET    /admin/predictions
+
+GET    /admin/statistics
+
+GET    /admin/system-health
+
+GET    /admin/logs
+19. Analytics
+GET    /analytics/system
+
+GET    /analytics/users
+
+GET    /analytics/doctors
+
+GET    /analytics/predictions
+20. Audit
+GET    /audit
+
+Tracks
+
+Login
+Prediction
+Report Download
+Appointment Changes
+Health Record Updates
+21. System
+GET    /system/status
+
+GET    /system/version
+
+GET    /system/features
+Global API Standards
+Pagination
+?page=1
+&limit=20
+Sorting
+?sort=name
+?sort=date
+?sort=confidence
+?sort=rating
+Filtering
+?status=
+?risk=
+?city=
+?specialization=
+Search
+?q=melanoma
+Standard Success Response
+{
+  "success": true,
+  "message": "Operation completed successfully.",
+  "data": {},
+  "pagination": {}
+}
+Standard Error Response
+{
+  "success": false,
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Requested resource was not found."
+  }
+}
+API Design Rules
+Use plural resource names (/doctors, /appointments, /reports).
+Use HTTP verbs correctly (GET, POST, PUT/PATCH, DELETE).
+Keep URLs noun-based; actions appear only where appropriate (e.g., /check-in, /refresh-token).
+Apply pagination, filtering, sorting, and search consistently to collection endpoints.
+Protect private endpoints with JWT authentication.
+Return standardized success and error envelopes.
+Final Summary
+Category	Endpoints
+Authentication	10
+Dashboard	1
+User Profile	5
+Doctors	5
+Appointments	6
+Smart Queue	4
+Health Records	9
+Images	7
+Predictions	9
+Reports	10
+Recommendations	3
+AI Assistant	10
+Conversations	5
+Outbreak Intelligence	9
+Notifications	4
+Search	1
+Preferences	2
+Doctor Dashboard	6
+Admin	6
+Analytics	4
+Audit	1
+System	3
+
+Total: ≈111 REST endpoints
+
+Architect Recommendation
+
+This should be considered the official API Contract v1.0 for DermAssist AI. It is intentionally scoped to support the current product vision and Phase 4–5 implementation. Future enterprise capabilities (RBAC management APIs, WebSockets, telemedicine, wearable integrations, streaming AI, etc.) should be introduced in later API versions (v2.x/v3.x) rather than expanding this contract, keeping v1.0 stable for frontend integration and production deployment.

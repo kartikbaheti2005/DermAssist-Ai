@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from core.config import (
     EMAIL_USER,
     EMAIL_PASSWORD,
-    FRONTEND_URL,
+    FRONTEND_URLS,
 )
 
 

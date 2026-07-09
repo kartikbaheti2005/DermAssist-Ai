@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from core.config import (
     APP_NAME,
-    FRONTEND_URL,
+    FRONTEND_URLS,
 )
 
 from core.startup import create_tables
@@ -54,11 +54,7 @@ def startup_event():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        FRONTEND_URL,
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ],
+    allow_origins = FRONTEND_URLS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,18 +77,21 @@ app.mount(
 )
 
 # =====================================================
-# Health
+# Server Check
 # =====================================================
 
 @app.get("/")
 def root():
-    return {
+     return {
         "message":
             "DermAssist AI Backend Running",
         "version":
             "3.0.0",
     }
 
+# =====================================================
+# Health
+# =====================================================
 
 @app.get("/health")
 def health():
@@ -111,34 +110,18 @@ app.include_router(admin_router)
 
 app.include_router(doctor_router)
 
-app.include_router(
-    appointment_router
-)
+app.include_router(appointment_router)
 
-app.include_router(
-    prediction_router
-)
+app.include_router(prediction_router)
 
-app.include_router(
-    health_record_router
-)
+app.include_router(health_record_router)
 
-app.include_router(
-    image_router
-)
+app.include_router(image_router)
 
-app.include_router(
-    chatbot_router
-)
+app.include_router(chatbot_router)
 
-app.include_router(
-    outbreak_router
-)
+app.include_router(outbreak_router)
 
-app.include_router(
-    report_router
-)
+app.include_router(report_router)
 
-app.include_router(
-    recommendation_router
-)
+app.include_router(recommendation_router)

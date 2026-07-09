@@ -1,0 +1,83 @@
+DermAssist AI — Phase 4 API Backlog (54 New APIs)
+Sprint 4.1 — Authentication (4)
+No.	Method	Endpoint
+1	GET	/auth/me
+2	POST	/auth/logout
+3	POST	/auth/change-password
+4	POST	/auth/refresh-token
+Sprint 4.2 — Dashboard (1)
+No.	Method	Endpoint
+5	GET	/dashboard/summary
+Sprint 4.3 — User Profile (3)
+No.	Method	Endpoint
+6	GET	/users/me
+7	PUT	/users/me
+8	DELETE	/users/account
+Sprint 4.4 — Doctors (4)
+No.	Method	Endpoint
+9	GET	/doctors/{doctor_id}
+10	GET	/doctors/search
+11	GET	/doctors/{doctor_id}/availability
+12	GET	/doctors/{doctor_id}/slots
+Sprint 4.5 — Appointments (3)
+No.	Method	Endpoint
+13	GET	/appointments/{appointment_id}
+14	PUT	/appointments/{appointment_id}/reschedule
+15	GET	/appointments/available-slots/{doctor_id}
+Sprint 4.6 — Smart Queue (4)
+No.	Method	Endpoint
+16	POST	/queue/join
+17	GET	/queue/me
+18	GET	/queue/history
+19	POST	/queue/refresh
+Sprint 4.7 — Reports (3)
+No.	Method	Endpoint
+20	GET	/reports
+21	GET	/reports/{report_id}
+22	GET	/reports/{report_id}/summary
+Sprint 4.8 — AI Assistant (5)
+No.	Method	Endpoint
+23	GET	/assistant/context
+24	GET	/assistant/suggestions
+25	GET	/assistant/actions
+26	POST	/assistant/follow-ups
+27	POST	/assistant/feedback
+Sprint 4.9 — Chat Conversations (5)
+No.	Method	Endpoint
+28	GET	/chatbot/conversations
+29	POST	/chatbot/conversations
+30	GET	/chatbot/conversations/{conversation_id}
+31	PATCH	/chatbot/conversations/{conversation_id}
+32	DELETE	/chatbot/conversations/{conversation_id}
+Sprint 4.10 — Prediction Enhancement (1)
+No.	Method	Endpoint
+33	GET	/predictions/{prediction_id}/explanation
+Sprint 4.11 — Outbreak Intelligence (5)
+No.	Method	Endpoint
+34	GET	/outbreaks/history
+35	GET	/outbreaks/weather
+36	GET	/outbreaks/heatmap
+37	GET	/outbreaks/compare
+38	GET	/outbreaks/location
+Sprint 4.12 — Notifications (4)
+No.	Method	Endpoint
+39	GET	/notifications
+40	PATCH	/notifications/{notification_id}/read
+41	PATCH	/notifications/read-all
+42	DELETE	/notifications/{notification_id}
+Sprint 4.13 — Doctor Dashboard (6)
+No.	Method	Endpoint
+43	GET	/doctor/dashboard
+44	GET	/doctor/patients
+45	GET	/doctor/reports
+46	GET	/doctor/statistics
+47	GET	/doctor/availability
+48	PUT	/doctor/availability
+Sprint 4.14 — Admin (6)
+No.	Method	Endpoint
+49	GET	/admin/users
+50	GET	/admin/reports
+51	GET	/admin/predictions
+52	GET	/admin/statistics
+53	GET	/admin/system-health
+54	GET	/admin/logs

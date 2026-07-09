@@ -55,15 +55,38 @@ EMAIL_PASSWORD = os.getenv(
 )
 
 
-# ==========================
-# Frontend
-# ==========================
 
-FRONTEND_URL = os.getenv(
-    "FRONTEND_URL",
-    "http://localhost:5173"
+# =====================================================
+# App
+# =====================================================
+
+APP_NAME = os.getenv(
+    "APP_NAME",
+    "DermAssist AI"
 )
 
+# =====================================================
+# Development Defaults
+# =====================================================
+
+DEV_FRONTEND_URLS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# =====================================================
+# Frontend Origins
+# =====================================================
+
+FRONTEND_URLS = os.getenv("FRONTEND_URLS")
+
+if FRONTEND_URLS:
+    FRONTEND_URLS = [
+        url.strip()
+        for url in FRONTEND_URLS.split(",")
+    ]
+else:
+    FRONTEND_URLS = DEV_FRONTEND_URLS
 
 # ==========================
 # AI Services

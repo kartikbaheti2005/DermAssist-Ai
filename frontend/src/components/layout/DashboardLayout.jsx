@@ -7,6 +7,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MobileBottomNav from "./MobileBottomNav";
+import Breadcrumb from "./Breadcrumb";
 
 // ===============================
 // Component
@@ -28,7 +29,13 @@ const DashboardLayout = () => {
         {/* Main Page Content */}
         <main className="flex-1 p-6 lg:ml-64">
 
-          <Outlet />
+            <div className="mx-auto max-w-7xl px-6 py-8">
+
+                <Breadcrumb />
+
+                <Outlet />
+
+            </div>
 
         </main>
 
