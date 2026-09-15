@@ -194,42 +194,28 @@ def get_doctors(
 
     if city:
         query = query.filter(
-            Doctor.city.ilike(
-                f"%{city}%"
+            Doctor.city.ilike(f"%{city}%")
+        )
+
+    if search:
+        query = query.filter(
+            or_(
+                Doctor.full_name.ilike(f"%{search}%"),
+                Doctor.specialty.ilike(f"%{search}%"),
+                Doctor.city.ilike(f"%{search}%"),
+                Doctor.specializes_in.ilike(f"%{search}%"),
+                Doctor.languages.ilike(f"%{search}%"),
+                Doctor.clinic_name.ilike(f"%{search}%"),
+                Doctor.bio.ilike(f"%{search}%"),
             )
         )
 
     doctors = query.all()
 
-    result = []
-
-    for doctor in doctors:
-
-        doctor_data = doctor.to_public_dict()
-
-        if search:
-            s = search.lower()
-
-            searchable = (
-                doctor_data["name"].lower()
-                + doctor_data["specialty"].lower()
-                + doctor_data["city"].lower()
-                + " ".join(
-                    doctor_data.get(
-                        "specializes_in",
-                        []
-                    )
-                ).lower()
-            )
-
-            if s not in searchable:
-                continue
-
-        result.append(
-            doctor_data
-        )
-
-    return result
+    return [
+        doctor.to_public_dict()
+        for doctor in doctors
+    ]
 
 
 # =====================================================
@@ -260,7 +246,7 @@ def get_doctor_profile(
     db: Session,
     doctor_id: int,
 ):
-    return (
+    doctor = (
         db.query(Doctor)
         .filter(
             Doctor.id == doctor_id
@@ -268,6 +254,81 @@ def get_doctor_profile(
         .first()
     )
 
+    if not doctor:
+        raise ValueError(
+            "Doctor not found."
+        )
+    
+    if not doctor.is_active:
+        raise ValueError(
+            "Doctor is inactive."
+        )
+    
+    if doctor.status.lower() != "approved":
+        raise ValueError(
+            "Doctor is not approved."
+        )
+    
+    return doctor.to_public_dict()
+
+
+# =====================================================
+# Doctor Availability
+# =====================================================
+
+def get_doctor_availability(
+    db: Session,
+    doctor_id: int,
+):
+    doctor = (
+        db.query(Doctor)
+        .filter(
+            Doctor.id == doctor_id,
+            Doctor.status == "approved",
+            Doctor.is_active == True,
+        )
+        .first()
+    )
+
+    if not doctor:
+        raise ValueError("Doctor not found.")
+
+    return {
+        "success": True,
+        "doctor_id": doctor.id,
+        "available_days": doctor._list_field(
+            doctor.available_days
+        ),
+    }
+
+# =====================================================
+# Doctor Slots
+# =====================================================
+
+def get_doctor_slots(
+    db: Session,
+    doctor_id: int,
+):
+    doctor = (
+        db.query(Doctor)
+        .filter(
+            Doctor.id == doctor_id,
+            Doctor.status == "approved",
+            Doctor.is_active == True,
+        )
+        .first()
+    )
+
+    if not doctor:
+        raise ValueError("Doctor not found.")
+
+    return {
+        "success": True,
+        "doctor_id": doctor.id,
+        "available_slots": doctor._list_field(
+            doctor.available_slots
+        ),
+    }
 
 def update_doctor_profile(
     db: Session,

@@ -1,7 +1,7 @@
 from typing import Optional
-
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from pydantic import Field
+from datetime import date
 
 # =====================================================
 # Register
@@ -29,19 +29,28 @@ class LoginRequest(BaseModel):
 #=======================================================
 # User Responce
 #=======================================================
+
 class UserResponse(BaseModel):
     id: int
     full_name: str
     username: str
-    email: EmailStr
-
-    phone_number: Optional[str] = None
-    gender: Optional[str] = None
-
+    email: str
+    phone_number: str | None = None
+    gender: str | None = None
     role: str
     is_active: bool
 
-    profile_picture: Optional[str] = None
+    profile_picture: str | None = None
+    bio: str | None = None
+    date_of_birth: date | None = None
+
+    height_cm: float | None = None
+    weight_kg: float | None = None
+    blood_group: str | None = None
+    medical_history: str | None = None
+    allergies: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LoginResponse(BaseModel):
@@ -62,18 +71,21 @@ class ForgotPasswordRequest(BaseModel):
 
 class ResetPasswordRequest(BaseModel):
     token: str
-    new_password: str
+    new_password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 
-password: str = Field(
-    min_length=8,
-    max_length=128,
-)
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 
-new_password: str = Field(
-    min_length=8,
-    max_length=128,
-)
-
+    new_password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 # =====================================================
 # Profile Update
 # =====================================================
@@ -82,7 +94,18 @@ class UpdateProfileRequest(BaseModel):
     full_name: Optional[str] = None
     phone_number: Optional[str] = None
     gender: Optional[str] = None
+    date_of_birth: Optional[date] = None
+
     bio: Optional[str] = None
+    profile_picture: Optional[str] = None
+
+    height_cm: Optional[float] = None
+    weight_kg: Optional[float] = None
+
+    blood_group: Optional[str] = None
+
+    medical_history: Optional[str] = None
+    allergies: Optional[str] = None
 
 
 # =====================================================

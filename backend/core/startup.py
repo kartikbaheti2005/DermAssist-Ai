@@ -10,7 +10,10 @@ from models.image import Image
 from models.prediction import Prediction
 from models.appointment import Appointment
 from models.health_record import HealthRecord
-
+from models.chat_conversation import ChatConversation
+from models.chat_message import ChatMessage
+from models.notification import Notification
+from models.smart_queue import SmartQueue
 
 def create_tables():
     Base.metadata.create_all(

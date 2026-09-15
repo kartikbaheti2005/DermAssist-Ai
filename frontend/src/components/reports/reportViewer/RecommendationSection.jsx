@@ -5,34 +5,26 @@ import {
   Stethoscope,
 } from "lucide-react";
 
-const recommendations = [
-  {
-    icon: ClipboardCheck,
-    title: "Immediate Action",
-    text: "No urgent medical intervention is required based on the current AI assessment.",
-    color: "bg-green-100 text-green-600",
-  },
-  {
-    icon: CalendarClock,
-    title: "Follow-up",
-    text: "Repeat a skin scan or consult a dermatologist in 6–12 months, or sooner if noticeable changes occur.",
-    color: "bg-sky-100 text-sky-600",
-  },
-  {
-    icon: Shield,
-    title: "Preventive Care",
-    text: "Use sunscreen daily, avoid excessive UV exposure, and monitor the lesion for changes in size, color, or shape.",
-    color: "bg-amber-100 text-amber-600",
-  },
-  {
-    icon: Stethoscope,
-    title: "Medical Advice",
-    text: "If itching, bleeding, pain, rapid growth, or irregular borders develop, schedule an appointment with a dermatologist immediately.",
-    color: "bg-red-100 text-red-600",
-  },
+const buildRecommendations = (report) => [
+
+    {
+        icon: ClipboardCheck,
+        title: "Predicted Condition",
+        text: report?.recommendation?.predicted_label,
+        color: "bg-green-100 text-green-600",
+    },
+
+    {
+        icon: Stethoscope,
+        title: "Recommended Specialist",
+        text: report?.recommendation?.recommended_specialty,
+        color: "bg-sky-100 text-sky-600",
+    },
+
 ];
 
-const RecommendationSection = () => {
+const RecommendationSection = ({ report }) => {
+  const recommendations = report? buildRecommendations(report): [];  
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
@@ -90,6 +82,21 @@ const RecommendationSection = () => {
         })}
 
       </div>
+
+      {report?.recommendation?.doctors?.length === 0 && (
+
+          <div className="mt-6 rounded-xl bg-slate-50 p-4">
+          
+              <p className="text-sm text-slate-600">
+
+                  No recommended doctors are available yet.
+                  Browse all dermatologists from the Doctors page.
+
+              </p>
+
+          </div>
+
+      )}
 
     </section>
   );

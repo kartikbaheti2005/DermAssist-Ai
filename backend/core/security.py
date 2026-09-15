@@ -15,7 +15,6 @@ pwd_context = CryptContext(
 
 token_blacklist: set = set()
 
-
 def hash_password(password: str):
     return pwd_context.hash(password)
 
@@ -49,6 +48,9 @@ def create_access_token(data: dict):
 
 
 def decode_token(token: str):
+
+    print(">>> decode_token received:", token)
+
     try:
 
         if token in token_blacklist:

@@ -47,8 +47,10 @@ def trending_diseases(
 # =====================================================
 
 @router.get("/alerts")
-def active_alerts():
-    return get_active_alerts()
+def active_alerts(
+    db: Session = Depends(get_db),
+):
+    return get_active_alerts(db)
 
 
 # =====================================================

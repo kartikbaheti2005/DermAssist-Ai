@@ -21,11 +21,21 @@ const AppointmentSummary = ({ doctor }) => {
       </h2>
 
       <div className="mt-6 flex flex-col items-center text-center">
-        <img
-          src={doctor.image}
+      <img
+          src={
+              doctor.image ||
+              "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(doctor.name) +
+              "&background=0ea5e9&color=fff"
+          }
           alt={doctor.name}
-          className="h-28 w-28 rounded-full object-cover border-4 border-sky-100"
-        />
+          onError={(e) => {
+              e.currentTarget.src =
+                  "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(doctor.name) +
+                  "&background=0ea5e9&color=fff";
+          }}
+      />
 
         <h3 className="mt-4 text-xl font-bold text-slate-800">
           {doctor.name}

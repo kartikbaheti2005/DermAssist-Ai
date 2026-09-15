@@ -5,30 +5,36 @@ import {
   CalendarCheck,
 } from "lucide-react";
 
-const timeline = [
-  {
-    title: "Image Uploaded",
-    date: "26 June 2026 • 10:15 AM",
-    icon: Upload,
-  },
-  {
-    title: "AI Analysis Completed",
-    date: "26 June 2026 • 10:16 AM",
-    icon: Brain,
-  },
-  {
-    title: "Report Generated",
-    date: "26 June 2026 • 10:17 AM",
-    icon: FileCheck,
-  },
-  {
-    title: "Consultation Recommended",
-    date: "26 June 2026",
-    icon: CalendarCheck,
-  },
+const buildTimeline = (report) => [
+
+    {
+        title: "Image Uploaded",
+        date: new Date(report.uploadedAt).toLocaleString(),
+        icon: Upload,
+    },
+
+    {
+        title: "AI Analysis Completed",
+        date: new Date(report.createdAt).toLocaleString(),
+        icon: Brain,
+    },
+
+    {
+        title: "Report Generated",
+        date: new Date(report.createdAt).toLocaleString(),
+        icon: FileCheck,
+    },
+
+    {
+        title: "Prediction Status",
+        date: report.stage,
+        icon: CalendarCheck,
+    },
+
 ];
 
-const ReportTimeline = () => {
+const ReportTimeline = ({ report }) => {
+  const timeline = buildTimeline(report);
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import PersonalStep from "./steps/PersonalStep";
 import PhysicalStep from "./steps/PhysicalStep";
@@ -14,40 +14,86 @@ const steps = [
   "Review",
 ];
 
-const HealthProfileWizard = ({onComplete}) => {
+const HealthProfileWizard = ({
+  onComplete,
+  initialData = null,
+}) => {
 
   const [currentStep, setCurrentStep] = useState(0);
 
   const [formData, setFormData] = useState({
+    age: "",
+    gender: "",
+    bloodGroup: "",
+    height: "",
+    weight: "",
+    chronicDiseases: [],
+    otherChronicDisease: "",
+    skinConditions: [],
+    otherSkinCondition: "",
+    allergies: "",
+    medications: "",
+    smoking: "",
+    alcohol: "",
+    exercise: "",
+    sunExposure: "",
+    sunscreenUsage: "",
+    skinType: "",
+  });
 
-  // Personal
-  age: "",
-  gender: "",
-  bloodGroup: "",
+  useEffect(() => {
 
-  // Physical
-  height: "",
-  weight: "",
+    if (!initialData) return;
 
-  //Medical
-  chronicDiseases: [],
-  otherChronicDisease: "",
-  skinConditions: [],
-  otherSkinCondition: "",
-  allergies: "",
-  medications: "",
+    setFormData({
 
-  //Lifestyle
-  // Lifestyle
+      age: "",
 
-  smoking: "",
-  alcohol: "",
-  exercise: "",
-  sunExposure: "",
-  sunscreenUsage: "",
-  skinType: "",
+      gender: initialData.gender || "",
 
-});
+      bloodGroup:
+        initialData.blood_group || "",
+
+      height:
+        initialData.height_cm || "",
+
+      weight:
+        initialData.weight_kg || "",
+
+      chronicDiseases:
+        initialData.medical_history
+          ? initialData.medical_history
+              .split(",")
+              .map(item => item.trim())
+          : [],
+
+      otherChronicDisease: "",
+
+      skinConditions:
+        initialData.notes
+          ? initialData.notes
+              .split(",")
+              .map(item => item.trim())
+          : [],
+
+      otherSkinCondition: "",
+
+      allergies:
+        initialData.allergies || "",
+
+      medications:
+        initialData.medications || "",
+
+      smoking: "",
+      alcohol: "",
+      exercise: "",
+      sunExposure: "",
+      sunscreenUsage: "",
+      skinType: "",
+
+    });
+
+  }, [initialData]);
 
   const renderStep = () => {
 

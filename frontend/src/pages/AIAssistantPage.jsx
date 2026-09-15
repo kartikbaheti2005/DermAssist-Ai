@@ -24,6 +24,7 @@ const AIAssistantPage = () => {
     onQuickAction,
     onSuggestedQuestion,
     onFollowUp,
+    onBackToHome,
   } = useAssistant();
 
   return (
@@ -44,6 +45,7 @@ const AIAssistantPage = () => {
         onQuickAction={onQuickAction}
         onSuggestedQuestion={onSuggestedQuestion}
         onFollowUp={onFollowUp}
+        onBackToHome={onBackToHome}
         
       />
   );

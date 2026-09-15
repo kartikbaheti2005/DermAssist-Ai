@@ -1,17 +1,21 @@
 from datetime import datetime, timedelta, UTC
 import secrets
-
+from time import perf_counter
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from models.user import User
 
-from schemas.auth import RegisterRequest
+from schemas.auth import (
+    RegisterRequest,
+    UpdateProfileRequest,
+)
 
 from core.security import (
     hash_password,
     verify_password,
     create_access_token,
+    token_blacklist,
 )
 
 from services.email_service import (
@@ -72,6 +76,11 @@ def login_user(
     identifier: str,
     password: str,
 ):
+    total_start = perf_counter()
+
+    # Database lookup
+    t = perf_counter()
+
     user = (
         db.query(User)
         .filter(
@@ -83,28 +92,44 @@ def login_user(
         .first()
     )
 
-    if not user:
-        return None
-    
-# TODO:Re-enable after email verification flow is implemented
+    print(f"[LOGIN] Database Query: {(perf_counter() - t) * 1000:.2f} ms")
 
-    # if not user.is_verified:
-    #     raise ValueError(
-    #         "Please verify your email"
-    #     )
+    if not user:
+        raise ValueError(
+            "Invalid email/username or password."
+        )
+
+    if not user.is_active:
+        raise ValueError(
+            "Your account has been deactivated. Please contact support."
+        )
+
+    # Password verification
+    t = perf_counter()
 
     if not verify_password(
         password,
         user.password_hash,
     ):
-        return None
+        raise ValueError(
+            "Invalid email/username or password."
+        )
+
+    print(f"[LOGIN] Password Verify: {(perf_counter() - t) * 1000:.2f} ms")
+
+    # Update last login
+    t = perf_counter()
 
     try:
         user.last_login = datetime.now(UTC)
         db.commit()
-
     except Exception:
         db.rollback()
+
+    print(f"[LOGIN] DB Commit: {(perf_counter() - t) * 1000:.2f} ms")
+
+    # JWT creation
+    t = perf_counter()
 
     token = create_access_token(
         {
@@ -113,6 +138,10 @@ def login_user(
             "role": user.role,
         }
     )
+
+    print(f"[LOGIN] JWT Creation: {(perf_counter() - t) * 1000:.2f} ms")
+
+    print(f"[LOGIN] TOTAL: {(perf_counter() - total_start) * 1000:.2f} ms")
 
     return {
         "access_token": token,
@@ -127,7 +156,68 @@ def login_user(
             "role": user.role,
             "is_active": user.is_active,
             "profile_picture": user.profile_picture,
-        }
+        },
+    }
+
+# =====================================================
+# Current User
+# =====================================================
+
+def get_current_user_profile(
+    current_user: User,
+) -> User:
+    return current_user
+
+
+# =====================================================
+# Logout
+# =====================================================
+
+def logout_user(
+    token: str,
+) -> dict:
+    token_blacklist.add(token)
+
+    return {
+        "message": "Logged out successfully"
+    }
+
+
+# =====================================================
+# Change Password
+# =====================================================
+
+def change_password(
+    db: Session,
+    current_user: User,
+    current_password: str,
+    new_password: str,
+):
+    if not verify_password(
+        current_password,
+        current_user.password_hash,
+    ):
+        raise ValueError(
+            "Current password is incorrect"
+        )
+
+    if verify_password(
+        new_password,
+        current_user.password_hash,
+    ):
+        raise ValueError(
+            "New password must be different from the current password."
+        )
+
+    current_user.password_hash = hash_password(
+        new_password
+    )
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "message": "Password changed successfully"
     }
 
 
@@ -197,10 +287,51 @@ def reset_password(
 
     if len(new_password) < 8:
         return False
-
+    
+    user.password_hash = hash_password(
+        new_password
+    )
+    
     user.reset_token = None
     user.reset_token_expiry = None
 
     db.commit()
 
     return True
+
+# =====================================================
+# Update Profile
+# =====================================================
+
+def update_profile(
+    db: Session,
+    current_user: User,
+    data: UpdateProfileRequest,
+):
+    update_data = data.model_dump(exclude_unset=True)
+
+    print("Incoming payload:", update_data)
+
+    for field, value in update_data.items():
+        setattr(current_user, field, value)
+
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
+
+# =====================================================
+# Deactivate Account
+# =====================================================
+
+def deactivate_account(
+    db: Session,
+    current_user: User,
+):
+    current_user.is_active = False
+
+    db.commit()
+
+    return {
+        "message": "Account deactivated successfully."
+    }

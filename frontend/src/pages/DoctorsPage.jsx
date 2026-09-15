@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { doctors } from "../data/doctors";
+import { getDoctors } from "../api/doctorApi";
 
 import DoctorCard from "../components/doctors/DoctorCard";
 import DoctorDrawer from "../components/doctors/DoctorDrawer";
@@ -38,62 +38,177 @@ const DoctorsPage = () => {
 
     const [drawerOpen, setDrawerOpen] = useState(false);
 
+    const [doctors, setDoctors] = useState([]);
+    
+    const [loading, setLoading] = useState(true);
+
     // -----------------------------
     // Filter Logic
     // -----------------------------
 
-    const filteredDoctors = useMemo(() => {
 
-        return doctors.filter((doctor) => {
+    useEffect(() => {
 
-            const matchesSearch =
+    console.log("useEffect Started");
 
-                doctor.name
-                    .toLowerCase()
-                    .includes(search.toLowerCase()) ||
+    const loadDoctors = async () => {
 
-                doctor.hospital
-                    .toLowerCase()
-                    .includes(search.toLowerCase()) ||
+        console.log("Calling API");
 
-                doctor.area
-                    .toLowerCase()
-                    .includes(search.toLowerCase()) ||
+        try {
 
-                doctor.location
-                    .toLowerCase()
-                    .includes(search.toLowerCase());
+            const response = await getDoctors();
 
-            const matchesExperience =
+const mappedDoctors = response.map((doctor) => ({
 
-                !filters.experience ||
+    id: doctor.id,
 
-                doctor.experience >= Number(filters.experience);
+    name: doctor.name,
 
-            const matchesRating =
+    image:
+        doctor.profile_picture ||
+        "/images/default-doctor.png",
 
-                !filters.rating ||
+    specialization:
+        doctor.specialty,
 
-                doctor.rating >= Number(filters.rating);
+    experience:
+        doctor.experience,
 
-            const matchesMode =
+    consultationFee:
+        doctor.consultation_fee,
 
-                !filters.mode ||
+    reviews:
+        doctor.review_count,
 
-                doctor.consultationMode === filters.mode;
+    rating:
+        doctor.rating,
 
-            return (
+    hospital:
+        doctor.clinic_name,
 
-                matchesSearch &&
-                matchesExperience &&
-                matchesRating &&
-                matchesMode
+    area:
+        doctor.city,
 
-            );
+    location:
+        doctor.city,
 
-        });
+    distance:
+        doctor.city,
 
-    }, [search, filters]);
+    consultationMode:
+        doctor.consultation_mode || "Offline",
+
+    availability:
+        doctor.available_days?.length
+            ? doctor.available_days.join(", ")
+            : "Unavailable",
+
+    languages:
+        doctor.languages || [],
+
+    qualification:
+        doctor.qualification || "",
+
+    about:
+        doctor.bio || "",
+
+    availableSlots:
+        doctor.available_slots || [],
+
+    raw: doctor,
+
+}));
+
+setDoctors(mappedDoctors);
+
+            console.log("Response:", response);
+
+        } catch (error) {
+
+            console.error(error);
+
+        } finally {
+
+            console.log("Finished");
+
+            setLoading(false);
+
+        }
+
+    };
+
+    loadDoctors();
+
+}, []);
+
+const filteredDoctors = useMemo(() => {
+
+    return doctors.filter((doctor) => {
+
+        const matchesSearch =
+
+            doctor.name
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            doctor.hospital
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            doctor.area
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            doctor.location
+                .toLowerCase()
+                .includes(search.toLowerCase());
+
+        const matchesExperience =
+
+            !filters.experience ||
+
+            doctor.experience >= Number(filters.experience);
+
+        const matchesRating =
+
+            !filters.rating ||
+
+            doctor.rating >= Number(filters.rating);
+
+        const matchesMode =
+
+            !filters.mode ||
+
+            doctor.consultationMode === filters.mode;
+
+        return (
+
+            matchesSearch &&
+            matchesExperience &&
+            matchesRating &&
+            matchesMode
+
+        );
+
+    });
+
+}, [doctors, search, filters]);
+
+    if (loading) {
+
+        return (
+
+            <div className="flex justify-center py-20">
+
+                Loading doctors...
+
+            </div>
+
+        );
+
+    }
+
 
     return (
 

@@ -72,9 +72,19 @@ const DoctorDrawer = ({
           <div className="flex flex-col items-center">
 
             <img
-              src={doctor.image}
-              alt={doctor.name}
-              className="h-28 w-28 rounded-full object-cover"
+                src={
+                    doctor.image ||
+                    "https://ui-avatars.com/api/?name=" +
+                    encodeURIComponent(doctor.name) +
+                    "&background=0ea5e9&color=fff"
+                }
+                alt={doctor.name}
+                onError={(e) => {
+                    e.currentTarget.src =
+                        "https://ui-avatars.com/api/?name=" +
+                        encodeURIComponent(doctor.name) +
+                        "&background=0ea5e9&color=fff";
+                }}
             />
 
             <h3 className="mt-4 text-xl font-bold">

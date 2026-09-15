@@ -5,7 +5,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 
-const SkinScanSection = () => {
+const SkinScanSection = ({report}) => {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
@@ -42,9 +42,13 @@ const SkinScanSection = () => {
         <div>
 
           <img
-            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80"
-            alt="Skin Scan"
-            className="h-80 w-full rounded-3xl object-cover"
+              src={`http://localhost:8000/${report.imagePath.replace(/\\/g, "/")}`}
+              alt="Uploaded lesion"
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                  e.target.src =
+                      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80";
+              }}
           />
 
         </div>
@@ -56,13 +60,13 @@ const SkinScanSection = () => {
           <InfoCard
             icon={CalendarDays}
             title="Scan Date"
-            value="26 June 2026"
+            value={new Date(report.uploadedAt).toLocaleDateString()}
           />
 
           <InfoCard
             icon={MapPin}
             title="Body Location"
-            value="Left Forearm"
+            value={report.bodyPart || "Not Specified"}
           />
 
           <InfoCard

@@ -7,17 +7,10 @@ import {
 } from "lucide-react";
 
 const statusColors = {
-  Confirmed:
-    "bg-green-100 text-green-700",
-
-  Pending:
-    "bg-yellow-100 text-yellow-700",
-
-  Cancelled:
-    "bg-red-100 text-red-700",
-
-  Completed:
-    "bg-slate-100 text-slate-700",
+  confirmed: "bg-green-100 text-green-700",
+  pending: "bg-yellow-100 text-yellow-700",
+  cancelled: "bg-red-100 text-red-700",
+  completed: "bg-slate-100 text-slate-700",
 };
 
 const AppointmentCard = ({
@@ -45,20 +38,28 @@ const AppointmentCard = ({
 
       <div className="flex items-start gap-4">
 
-        <img
-          src={appointment.doctor.image}
-          alt={appointment.doctor.name}
-          className="h-16 w-16 rounded-xl object-cover"
-        />
+        <div
+          className="
+              flex
+              h-16
+              w-16
+              items-center
+              justify-center
+              rounded-full
+              bg-blue-100
+          "
+      >
+          👨‍⚕️
+      </div>
 
         <div className="flex-1">
 
           <h3 className="font-semibold text-slate-800">
-            {appointment.doctor.name}
+            {appointment.doctorName}
           </h3>
 
           <p className="text-sm text-sky-600">
-            {appointment.doctor.specialization}
+            {appointment.specialization}
           </p>
 
         </div>
@@ -73,7 +74,8 @@ const AppointmentCard = ({
             ${statusColors[appointment.status]}
           `}
         >
-          {appointment.status}
+          {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+          
         </span>
 
       </div>
@@ -100,18 +102,10 @@ const AppointmentCard = ({
 
         <div className="flex items-center gap-3 text-sm text-slate-600">
 
-          {appointment.mode === "Online" ? (
-
-            <Video size={17} />
-
-          ) : (
-
-            <Building2 size={17} />
-
-          )}
-
-          {appointment.mode}
-
+          <Building2 size={17} />
+                  
+          {appointment.hospital}
+                  
         </div>
 
       </div>

@@ -194,7 +194,7 @@ const UploadCard = ({onAnalyze,}) => {
 
       <button
         disabled={!selectedImage}
-        onClick={onAnalyze}
+        onClick={() => onAnalyze(selectedImage)}
         className="
           mt-8
           w-full

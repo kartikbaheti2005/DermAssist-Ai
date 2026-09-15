@@ -17,7 +17,7 @@ def send_reset_email(
 ) -> bool:
 
     reset_link = (
-        f"{FRONTEND_URL}"
+        f"{FRONTEND_URLS}"
         f"/reset-password?token={reset_token}"
     )
 

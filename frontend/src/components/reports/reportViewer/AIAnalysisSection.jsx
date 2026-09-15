@@ -5,31 +5,36 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const findings = [
-  {
-    icon: CheckCircle2,
-    title: "Primary Observation",
-    text: "The lesion demonstrates a uniform pigment pattern with well-defined and symmetrical borders.",
-    color: "text-green-600",
-    bg: "bg-green-100",
-  },
-  {
-    icon: AlertCircle,
-    title: "Clinical Indicators",
-    text: "No significant asymmetry, ulceration, bleeding, or irregular vascular structures were detected.",
-    color: "text-amber-600",
-    bg: "bg-amber-100",
-  },
-  {
-    icon: Sparkles,
-    title: "AI Interpretation",
-    text: "The extracted visual features closely match benign melanocytic nevus patterns observed during model training.",
-    color: "text-sky-600",
-    bg: "bg-sky-100",
-  },
+const buildFindings = (report) => [
+
+    {
+        icon: CheckCircle2,
+        title: "Prediction",
+        text: report.disease,
+        color: "text-green-600",
+        bg: "bg-green-100",
+    },
+
+    {
+        icon: AlertCircle,
+        title: "Risk Level",
+        text: report.risk,
+        color: "text-amber-600",
+        bg: "bg-amber-100",
+    },
+
+    {
+        icon: Sparkles,
+        title: "AI Summary",
+        text: report.aiSummary,
+        color: "text-sky-600",
+        bg: "bg-sky-100",
+    },
+
 ];
 
-const AIAnalysisSection = () => {
+const AIAnalysisSection = ( {report} ) => {
+  const findings = buildFindings(report);
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
@@ -94,11 +99,17 @@ const AIAnalysisSection = () => {
         </h3>
 
         <p className="mt-3 text-sm leading-7 text-slate-700">
-          Based on the visual analysis, the lesion is most consistent with a
-          benign melanocytic nevus. The confidence score is high and no
-          high-risk visual indicators were detected. Continue routine skin
-          monitoring and seek medical evaluation if the lesion changes in
-          appearance, size, or symptoms.
+              
+            {report.aiSummary}
+              
+            <br /><br />
+              
+            <strong>Model Version:</strong> {report.model}
+              
+            <br />
+              
+            <strong>Processing Time:</strong> {report.processingTime} ms
+              
         </p>
 
       </div>

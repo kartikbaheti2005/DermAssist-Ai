@@ -9,23 +9,28 @@ import {
 
 const VitalStatsCard = ({data}) => {
   const bmi =
-    data?.height && data?.weight
-        ? (
-              data.weight /
-              Math.pow(data.height / 100, 2)
-          ).toFixed(1)
-        : "--";
-  
+    data?.bmi ??
+    (data?.weight && data?.height
+      ? (data.weight / Math.pow(data.height / 100, 2)).toFixed(1)
+      : "--");
+
   const stats = [
     {
       title: "Height",
-      value: data?.height,
+      value:
+        data?.height_cm
+            ? `${data.height_cm} cm`
+            : "--",
       icon: Ruler,
       color: "text-blue-600",
     },
     {
-      title: data?.Weight,
-      value: "68 kg",
+      title: "Weight",
+
+      value:
+          data?.weight_kg
+              ? `${data.weight_kg} kg`
+              : "--",
       icon: Weight,
       color: "text-emerald-600",
     },
@@ -37,7 +42,8 @@ const VitalStatsCard = ({data}) => {
     },
     {
       title: "Blood Group",
-      value: "O+",
+      value:
+          data?.blood_group || "--",
       icon: Droplets,
       color: "text-red-500",
     },

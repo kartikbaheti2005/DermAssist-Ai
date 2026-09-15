@@ -1,16 +1,16 @@
-import { useState } from "react";
-
 const FILTERS = [
   "All",
+  "Confirmed",
   "Upcoming",
   "Pending",
-  "Confirmed",
   "Completed",
   "Cancelled",
 ];
 
-const AppointmentFilters = () => {
-  const [activeFilter, setActiveFilter] = useState("All");
+const AppointmentFilters = ({
+    activeFilter,
+    setActiveFilter,
+}) => {
 
   return (
     <div className="flex flex-wrap gap-3">

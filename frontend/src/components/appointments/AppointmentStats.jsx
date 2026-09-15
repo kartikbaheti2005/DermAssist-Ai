@@ -1,42 +1,63 @@
 import {
-  CalendarDays,
   Clock3,
   CheckCircle2,
   ClipboardCheck,
+  CircleSlash,
 } from "lucide-react";
 
-const stats = [
-  {
-    title: "Upcoming",
-    value: 2,
-    icon: CalendarDays,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    title: "Pending",
-    value: 1,
-    icon: Clock3,
-    iconBg: "bg-yellow-100",
-    iconColor: "text-yellow-600",
-  },
-  {
-    title: "Confirmed",
-    value: 3,
-    icon: CheckCircle2,
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
-  },
-  {
-    title: "Completed",
-    value: 18,
-    icon: ClipboardCheck,
-    iconBg: "bg-slate-100",
-    iconColor: "text-slate-600",
-  },
-];
 
-const AppointmentStats = () => {
+const AppointmentStats = ({appointments = []}) => {
+      const stats = [
+      
+          {
+              title: "Confirmed",
+              value: appointments.filter(
+                  appointment =>
+                      appointment.status === "confirmed"
+              ).length,
+      
+              icon: CheckCircle2,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+          },
+      
+          {
+              title: "Pending",
+              value: appointments.filter(
+                  appointment =>
+                      appointment.status === "pending"
+              ).length,
+      
+              icon: Clock3,
+              iconBg: "bg-yellow-100",
+              iconColor: "text-yellow-600",
+          },
+      
+          {
+              title: "Cancelled",
+              value: appointments.filter(
+                  appointment =>
+                      appointment.status === "cancelled"
+              ).length,
+      
+              icon: CircleSlash,
+              iconBg: "bg-red-100",
+              iconColor: "text-red-600",
+          },
+      
+          {
+              title: "Completed",
+              value: appointments.filter(
+                  appointment =>
+                      appointment.status === "completed"
+              ).length,
+      
+              icon: ClipboardCheck,
+              iconBg: "bg-slate-100",
+              iconColor: "text-slate-600",
+          },
+      
+      ];
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((item) => {

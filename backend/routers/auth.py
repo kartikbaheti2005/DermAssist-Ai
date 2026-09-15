@@ -15,6 +15,10 @@ from schemas.auth import (
     LoginRequest,
     ForgotPasswordRequest,
     ResetPasswordRequest,
+    ChangePasswordRequest,
+    UserResponse,
+    MessageResponse,
+    UpdateProfileRequest,
 )
 
 from services.auth_service import (
@@ -22,7 +26,19 @@ from services.auth_service import (
     login_user,
     forgot_password,
     reset_password,
+    get_current_user_profile,
+    logout_user,
+    change_password,
+    update_profile,
+    deactivate_account,
 )
+
+from core.dependencies import (
+    get_current_user,
+    oauth2_scheme,
+)
+
+from models.user import User
 
 router = APIRouter(
     prefix="/auth",
@@ -97,7 +113,66 @@ def login(
             detail=str(e),
         )
 
+# =====================================================
+# Current User
+# =====================================================
 
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+def get_me(
+    current_user: User = Depends(get_current_user),
+):
+    return get_current_user_profile(
+        current_user,
+    )
+
+
+# =====================================================
+# Logout
+# =====================================================
+
+@router.post(
+    "/logout",
+    response_model=MessageResponse,
+)
+def logout(
+    token: str = Depends(oauth2_scheme),
+    current_user: User = Depends(get_current_user),
+):
+    return logout_user(
+        token,
+    )
+
+
+# =====================================================
+# Change Password
+# =====================================================
+
+@router.post(
+    "/change-password",
+    response_model=MessageResponse,
+)
+def change_user_password(
+    payload: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return change_password(
+            db=db,
+            current_user=current_user,
+            current_password=payload.current_password,
+            new_password=payload.new_password,
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
+    
 # =====================================================
 # Forgot Password
 # =====================================================
@@ -144,3 +219,35 @@ def reset_password_route(
         "message":
         "Password reset successful"
     }
+
+# =======================================================
+# Update Profile
+# =======================================================
+
+@router.put(
+    "/profile",
+    response_model=UserResponse,
+)
+def update_user_profile(
+    payload: UpdateProfileRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return update_profile(
+        db=db,
+        current_user=current_user,
+        data=payload,
+    )
+
+@router.delete(
+    "/account",
+    response_model=MessageResponse,
+)
+def delete_account(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return deactivate_account(
+        db=db,
+        current_user=current_user,
+    )

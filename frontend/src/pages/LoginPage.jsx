@@ -38,19 +38,24 @@ const LoginPage = () => {
       return;
     }
 
+    console.time("Navigation");
+
     switch (result.role) {
       case "doctor":
         navigate("/doctor/dashboard");
         break;
-
+    
       case "admin":
         navigate("/admin");
         break;
-
+    
       default:
         navigate("/");
         break;
     }
+    
+    console.timeEnd("Navigation");
+
   };
 
   return (

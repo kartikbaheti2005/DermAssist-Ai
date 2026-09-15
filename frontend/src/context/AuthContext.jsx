@@ -1,6 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {  
+  useState, 
+  useEffect,
+  useContext, 
+  useRef, 
+  createContext 
+} from "react";
 
-import { loginUser, registerUser } from "../api/authApi";
+import {
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  logoutUser,
+} from "../api/authApi";
 
 import {
   saveToken,
@@ -19,22 +30,55 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const hasRestoredSession = useRef(false);
 
+  /**
+   * Restore authenticated session from backend.
+   */
+  const restoreSession = async () => {
+    const storedToken = getToken();
+
+    console.log("Token from getToken():", storedToken);
+
+    if (!storedToken) {
+      console.log("No token found. Exiting restoreSession.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Calling /auth/me");
+
+    try {
+      const currentUser = await getCurrentUser();
+      const currentRole = currentUser?.role;
+      console.log("currentUser:", currentUser);
+    
+      saveUser(currentUser);
+      saveRole(currentRole);
+      
+      console.log("Session restored successfully");
+
+      setToken(storedToken);
+      setUser(currentUser);
+      setRole(currentRole);
+    } catch (error) {
+      clearAuth();
+    
+      setToken(null);
+      setUser(null);
+      setRole(null);
+    } finally {
+      setLoading(false);
+    }
+  };
   /**
    * Restore session on app startup
    */
-  useEffect(() => {
-    const storedToken = getToken();
-    const storedUser = getUser();
-    const storedRole = getRole();
+   useEffect(() => {
+    if (hasRestoredSession.current) return;
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(storedUser);
-      setRole(storedRole);
-    }
-
-    setLoading(false);
+    hasRestoredSession.current = true;
+    restoreSession();
   }, []);
 
   /**
@@ -42,11 +86,17 @@ export const AuthProvider = ({ children }) => {
    */
   const login = async (credentials) => {
     try {
+      console.time("LOGIN TOTAL");
+
+      console.time("LOGIN API");
       const data = await loginUser(credentials);
+      console.timeEnd("LOGIN API");
+
+      console.time("SAVE AUTH");
 
       const authToken = data.access_token;
       const authUser = data.user;
-      const authRole = data.user?.role;
+      const authRole = authUser?.role;
 
       saveToken(authToken);
       saveUser(authUser);
@@ -56,20 +106,34 @@ export const AuthProvider = ({ children }) => {
       setUser(authUser);
       setRole(authRole);
 
+      console.timeEnd("SAVE AUTH");
+
+      console.timeEnd("LOGIN TOTAL");
+
       return {
         success: true,
         role: authRole,
         user: authUser,
       };
-    } catch (error) {
+    }
+    catch (error) {
+      let message = "Login failed";
+    
+      if (Array.isArray(error?.response?.data?.detail)) {
+        message =
+          error.response.data.detail[0]?.msg || message;
+      } else if (typeof error?.response?.data?.detail === "string") {
+        message = error.response.data.detail;
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+    
       return {
         success: false,
-        message:
-          error?.response?.data?.detail ||
-          error?.response?.data?.message ||
-          "Login failed",
+        message,
       };
     }
+  
   };
 
   /**
@@ -83,13 +147,21 @@ export const AuthProvider = ({ children }) => {
         success: true,
         data,
       };
-    } catch (error) {
+    }catch (error) {
+      let message = "Registration failed";
+        
+      if (Array.isArray(error?.response?.data?.detail)) {
+        message =
+          error.response.data.detail[0]?.msg || message;
+      } else if (typeof error?.response?.data?.detail === "string") {
+        message = error.response.data.detail;
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+    
       return {
         success: false,
-        message:
-          error?.response?.data?.detail ||
-          error?.response?.data?.message ||
-          "Registration failed",
+        message,
       };
     }
   };
@@ -97,22 +169,43 @@ export const AuthProvider = ({ children }) => {
   /**
    * Logout
    */
-  const logout = () => {
-    clearAuth();
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      // Ignore backend logout errors and always clear the local session.
+    } finally {
+      clearAuth();
 
-    setUser(null);
-    setRole(null);
-    setToken(null);
+      setUser(null);
+      setRole(null);
+      setToken(null);
+    }
   };
 
   const value = {
+    // ==========================
+    // State
+    // ==========================
     user,
+    setUser,
+
     role,
+    setRole,
+
     token,
+    setToken,
+
     loading,
 
+    // ==========================
+    // Auth Status
+    // ==========================
     isAuthenticated: !!token,
 
+    // ==========================
+    // Actions
+    // ==========================
     login,
     register,
     logout,

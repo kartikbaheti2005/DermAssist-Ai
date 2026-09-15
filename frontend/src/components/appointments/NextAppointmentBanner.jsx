@@ -7,8 +7,28 @@ const mockAppointment = {
   status: "Confirmed",
 };
 
-const NextAppointmentBanner = () => {
-  const appointment = mockAppointment;
+const NextAppointmentBanner = ({appointments = [], onView,}) => {
+  const appointment = appointments.filter(
+              appointment =>
+                  appointment.status ===
+                  "confirmed"
+          )
+
+          .sort((a, b) => {
+
+              const first =
+                  new Date(
+                      `${a.date} ${a.time}`
+                  );
+
+              const second =
+                  new Date(
+                      `${b.date} ${b.time}`
+                  );
+
+              return first - second;
+
+          })[0];
 
   if (!appointment) return null;
 
@@ -41,10 +61,16 @@ const NextAppointmentBanner = () => {
           </div>
         </div>
 
-        <button
-          className="rounded-xl bg-sky-600 px-5 py-3 font-semibold text-white transition hover:bg-sky-700"
+       <button
+            onClick={() => {
+                console.log("Banner clicked");
+                console.log(appointment);
+            
+                onView?.(appointment);
+            }}
+            className="rounded-xl bg-sky-600 px-5 py-3 font-semibold text-white transition hover:bg-sky-700"
         >
-          View Details
+            View Details
         </button>
       </div>
     </div>

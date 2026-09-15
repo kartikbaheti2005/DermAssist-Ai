@@ -7,6 +7,8 @@ import ProcessingLoader from "../components/prediction/ProcessingLoader";
 import ResultCard from "../components/prediction/ResultCard";
 import ExplainableAI from "../components/prediction/ExplainableAI";
 import RecommendationPanel from "../components/prediction/RecommendationPanel";
+import { predictImage } from "../api/predictionApi";
+import { uploadImage } from "../api/imageApi";
 
 import {
   Upload,
@@ -23,7 +25,7 @@ const PAGE_STATE = {
   UPLOAD: "upload",
   PROCESSING: "processing",
   RESULT: "result",
-};
+};  
 
 const LesionTrackerPage = () => {
   /**
@@ -36,15 +38,38 @@ const LesionTrackerPage = () => {
    */
 
   const [pageState, setPageState] = useState(PAGE_STATE.UPLOAD);
+  const [prediction, setPrediction] = useState(null);
 
-  const handleAnalyze = () => {
-    setPageState(PAGE_STATE.PROCESSING);
-
-    // Temporary demo
-
-    setTimeout(() => {
-      setPageState(PAGE_STATE.RESULT);
-    }, 4000);
+  const handleAnalyze = async (imageFile) => {
+  
+      setPageState(PAGE_STATE.PROCESSING);
+  
+      try {
+      
+          const upload = await uploadImage(imageFile);
+      
+          console.log("Upload Response:", upload);
+      
+          const prediction = await predictImage(
+              upload.image.id
+          );
+        
+          console.log(JSON.stringify(prediction.prediction,null,2));
+        
+          setPrediction(prediction.prediction);
+        
+          setPageState(PAGE_STATE.RESULT);
+        
+      } catch (error) {
+      
+          console.error(error);
+      
+          alert("Prediction failed.");
+      
+          setPageState(PAGE_STATE.UPLOAD);
+      
+      }
+    
   };
 
   const handleAnalyzeAnother = () => {
@@ -303,7 +328,7 @@ const LesionTrackerPage = () => {
 
             {/* Result */}
 
-            <ResultCard />
+            <ResultCard prediction={prediction}/>
 
             {/* Lower Grid */}
 

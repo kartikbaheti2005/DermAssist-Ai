@@ -2,6 +2,7 @@ import {
   MapPin,
   IndianRupee,
   Clock,
+  UserRound
 } from "lucide-react";
 
 import RatingStars from "./RatingStars";
@@ -29,18 +30,24 @@ const DoctorCard = ({ doctor, onSelect }) => {
 
       <div className="flex justify-center">
 
-        <img
-          src={doctor.image}
-          alt={doctor.name}
-          className="
-            h-20
-            w-20
+      <div
+        className="
+            flex
+            h-24
+            w-24
+            items-center
+            justify-center
             rounded-full
-            object-cover
-            border-2
-            border-slate-100
-          "
+            bg-blue-100
+            border
+            border-blue-200
+        "
+    >
+        <UserRound
+            size={48}
+            className="text-blue-600"
         />
+    </div>
 
       </div>
 

@@ -8,13 +8,51 @@ import {
 } from "lucide-react";
 
 import AppointmentStatusBadge from "./AppointmentStatusBadge";
+import { cancelAppointment } from "../../api/appointmentApi";
 
 const AppointmentDetailsDrawer = ({
   appointment,
   open,
   onClose,
+  onRefresh,
 }) => {
-  if (!open || !appointment) return null;
+    const handleCancel = async () => {
+
+      const confirmed = window.confirm(
+          "Cancel this appointment?"
+      );
+
+      if (!confirmed) return;
+
+      try {
+
+          await cancelAppointment(
+              appointment.id
+          );
+
+          if (onRefresh) {
+
+              await onRefresh();
+
+          }
+
+          onClose();
+
+      } catch (error) {
+
+          console.error(error);
+
+          // alert(
+          //     "Unable to cancel appointment."
+          // );
+
+      }
+
+  };
+
+  if (!open || !appointment) {
+      return null;
+  }
 
   return (
     <>
@@ -52,11 +90,20 @@ const AppointmentDetailsDrawer = ({
 
           {/* Doctor */}
           <div className="flex gap-4">
-            <img
-              src={appointment.image}
-              alt={appointment.doctorName}
-              className="h-20 w-20 rounded-xl object-cover"
-            />
+            <div
+              className="
+                  flex
+                  h-20
+                  w-20
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-blue-100
+                  text-4xl
+              "
+          >
+              👨‍⚕️
+          </div>
 
             <div>
               <h3 className="font-semibold text-slate-800">
@@ -126,6 +173,44 @@ const AppointmentDetailsDrawer = ({
           </div>
 
         </div>
+
+        <div className="mt-8 flex gap-3">
+
+          {appointment.status !==
+              "cancelled" && (
+              
+              <button
+                  onClick={handleCancel}
+                  className="
+                      flex-1
+                      rounded-xl
+                      bg-red-600
+                      py-3
+                      font-semibold
+                      text-white
+                      hover:bg-red-700
+                  "
+              >
+                  Cancel Appointment
+              </button>
+
+          )}
+
+          <button
+              onClick={onClose}
+              className="
+                  flex-1
+                  rounded-xl
+                  border
+                  border-slate-300
+                  py-3
+                  font-semibold
+              "
+          >
+              Close
+          </button>
+        
+      </div>
       </div>
     </>
   );

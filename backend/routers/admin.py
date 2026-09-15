@@ -6,6 +6,7 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
+
 from database.session import get_db
 
 from core.dependencies import (
@@ -16,6 +17,10 @@ from models.doctor import Doctor
 
 from schemas.doctor import (
     DoctorRejectionRequest,
+)
+
+from services.admin_service import (
+    get_admin_dashboard
 )
 
 from services.doctor_service import (
@@ -141,3 +146,13 @@ def delete_doctor_route(
             status_code=404,
             detail=str(e),
         )
+    
+# =====================================================
+# Admin Dashboard
+# =====================================================
+@router.get("/dashboard")
+def admin_dashboard(
+    db: Session = Depends(get_db),
+    current_admin=Depends(get_current_admin),
+):
+    return get_admin_dashboard(db)

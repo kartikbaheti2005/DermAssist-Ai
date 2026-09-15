@@ -102,3 +102,65 @@ class DoctorRejectionRequest(BaseModel):
 
 class DoctorAppointmentStatusRequest(BaseModel):
     status: str
+
+# =====================================================
+# Response Schemas
+# =====================================================
+
+class DoctorResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    name: str
+
+    phone: Optional[str] = None
+    gender: Optional[str] = None
+    date_of_birth: Optional[str] = None
+
+    post: Optional[str] = None
+    specialty: Optional[str] = None
+    qualification: Optional[str] = None
+    education_details: Optional[str] = None
+    practice_start_year: Optional[int] = None
+
+    clinic_name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+
+    available_days: list[str] = []
+    available_slots: list[str] = []
+
+    specializes_in: list[str] = []
+    languages: list[str] = []
+
+    consultation_fee: int
+
+    bio: Optional[str] = None
+    profile_picture: Optional[str] = None
+
+    rating: float
+    review_count: int
+
+    status: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class DoctorListResponse(BaseModel):
+    success: bool
+    message: str
+    data: list[DoctorResponse]
+
+
+class DoctorAvailabilityResponse(BaseModel):
+    success: bool
+    doctor_id: int
+    available_days: list[str]
+
+
+class DoctorSlotsResponse(BaseModel):
+    success: bool
+    doctor_id: int
+    available_slots: list[str]

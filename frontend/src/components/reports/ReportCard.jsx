@@ -36,19 +36,19 @@ const ReportCard = ({ report, onClick }) => {
         <div className="flex flex-1 gap-4">
 
           <img
-            src={report.image}
-            alt={report.disease}
+            src="https://placehold.co/120x120?text=Skin"
+            alt={report.title}
             className="h-24 w-24 rounded-xl object-cover"
           />
 
           <div className="flex-1">
 
             <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              {report.id}
+              REP-{report.id}
             </span>
 
             <h3 className="mt-1 text-lg font-semibold text-slate-800">
-              {report.disease}
+              {report.title}
             </h3>
 
             <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-500">
@@ -60,14 +60,14 @@ const ReportCard = ({ report, onClick }) => {
 
               <div className="flex items-center gap-1">
                 <CalendarDays className="h-4 w-4" />
-                {report.scanDate}
+                {new Date(report.date).toLocaleDateString()}
               </div>
 
             </div>
 
             <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
               <UserRound className="h-4 w-4" />
-              {report.doctor.name}
+              DermAssist AI
             </div>
 
           </div>
@@ -77,7 +77,7 @@ const ReportCard = ({ report, onClick }) => {
         {/* Right Section */}
         <div className="flex flex-col items-end justify-between gap-4">
 
-          <RiskBadge risk={report.risk} />
+          <RiskBadge risk={report.riskLevel} />
 
           <div className="flex items-center gap-2 text-sm font-medium text-sky-600">
 

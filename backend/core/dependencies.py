@@ -3,6 +3,7 @@ from fastapi import (
     HTTPException,
     status,
 )
+from time import perf_counter
 
 from fastapi.security import OAuth2PasswordBearer
 
@@ -17,7 +18,7 @@ from models.doctor import Doctor
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="auth/login"
+    tokenUrl="/auth/login"
 )
 
 
@@ -25,7 +26,7 @@ def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-
+    
     payload = decode_token(token)
 
     if not payload:
@@ -42,12 +43,17 @@ def get_current_user(
             detail="Invalid token payload",
         )
 
+
+    start = perf_counter()
+
     user = (
         db.query(User)
         .filter(User.id == int(user_id))
         .first()
     )
-
+    
+    print(f"User query: {(perf_counter() - start) * 1000:.2f} ms")
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -5,6 +5,10 @@ from sqlalchemy.orm import Session
 from models.health_record import HealthRecord
 from models.user import User
 
+from services.notification_service import (
+    notify_health_record_created,
+    notify_health_record_updated,
+)
 
 # =====================================================
 # BMI Calculator
@@ -78,6 +82,11 @@ def create_health_record(
     db.commit()
 
     db.refresh(record)
+
+    notify_health_record_created(
+        db=db,
+        user_id=current_user.id,
+    )
 
     return record
 
@@ -157,6 +166,11 @@ def update_health_record(
     db.commit()
 
     db.refresh(record)
+
+    notify_health_record_updated(
+        db=db,
+        user_id=record.user_id,
+    )
 
     return record
 

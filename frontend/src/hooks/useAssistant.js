@@ -1,26 +1,104 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
-  conversations as initialConversations,
-  healthSnapshot,
-  latestPrediction,
-  latestReport,
-  nextAppointment,
-  quickActions,
-  suggestedQuestions,
-  suggestedFollowUps,
+    getAssistantContext,
+    getAssistantSuggestions,
+    getAssistantActions,
+} from "../api/assistantApi";
+
+import {
+    conversations as initialConversations,
 } from "../data/assistantData";
 
 const useAssistant = () => {
   const [conversations, setConversations] = useState(initialConversations);
   const [activeConversationId, setActiveConversationId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [healthSnapshot, setHealthSnapshot] = useState({});
+  const [latestPrediction, setLatestPrediction] = useState({});
+  const [latestReport, setLatestReport] = useState({});
+  const [nextAppointment, setNextAppointment] = useState({});
+  const [quickActions, setQuickActions] = useState([]);
+  const [suggestedQuestions, setSuggestedQuestions] = useState([]);
+  const [suggestedFollowUps, setSuggestedFollowUps] = useState([]);
+  const navigate = useNavigate();
 
-  const activeConversation =
+useEffect(() => {
+    loadAssistantData();
+}, []);
+
+const activeConversation =
     conversations.find(
-      (conversation) => conversation.id === activeConversationId
+        (conversation) =>
+            conversation.id === activeConversationId
     ) || null;
 
+  const loadAssistantData = async () => {
+
+      try {
+
+          const [
+
+              context,
+              suggestions,
+              actions,
+
+          ] = await Promise.all([
+              getAssistantContext(),
+              getAssistantSuggestions(),
+              getAssistantActions(),
+
+          ]);
+
+          console.log("Assistant Context", context);
+          console.log("Suggestions", suggestions);
+          console.log("Actions", actions);
+
+          setHealthSnapshot({
+              bmi: context.latest_health_record?.bmi,
+              bloodGroup: context.latest_health_record?.blood_group,
+              allergies: context.latest_health_record?.allergies,
+              medications: context.latest_health_record?.medications,
+          });
+
+          setLatestReport({
+              id: context.latest_prediction?.id,
+              generatedOn: context.latest_prediction?.created_at,
+              status: "Generated",
+          });
+
+          setNextAppointment({
+              doctor: context.next_appointment?.doctor?.name,
+              specialization: context.next_appointment?.doctor?.specialty,
+              date: context.next_appointment?.appointment_date,
+              time: context.next_appointment?.appointment_time,
+              status: context.next_appointment?.status,
+          });
+
+          setQuickActions(actions);
+
+          setSuggestedQuestions(
+              suggestions.map(item => item.title)
+          );
+
+          setSuggestedFollowUps(
+              suggestions.map(item => item.description)
+          );
+          
+          setLatestPrediction({
+              disease: context.latest_prediction?.disease,
+              confidence: context.latest_prediction?.confidence,
+              risk: context.latest_prediction?.risk_level,
+              model: "DermAssist AI",
+          });
+      }
+
+      catch (err) {
+          console.error(err);
+      }
+
+  };
   const createConversation = (title = "New Conversation") => {
     const id = Date.now();
 
@@ -83,24 +161,38 @@ const useAssistant = () => {
   };
 
   const handleNewChat = () => {
-    createConversation();
+      createConversation();
+      setActiveConversationId(null);
   };
 
   const handleSendMessage = (content) => {
-    console.log("Sending:", content);
-    let conversationId = activeConversationId;
+      let conversationId = activeConversationId;
+      if (!conversationId) {
+          conversationId = createConversation();
+          setActiveConversationId(conversationId);
+      }
 
-    if (!conversationId) {
-      conversationId = createConversation();
-    }
-
-    sendMessageToConversation(conversationId, content);
+      sendMessageToConversation(
+          conversationId,
+          content
+      );
   };
 
-  const handleQuickAction = (action) => {
-    handleSendMessage(action.prompt);
+  const routeMap = {
+      "/health-records/latest": "/health-records",
+      "/appointments/my": "/appointments",
+  
+      // TEMP until Prediction page exists
+      "/predictions": "/reports",
   };
 
+const handleQuickAction = (action) => {
+
+    console.log(action);
+
+    navigate(routeMap[action.route] || action.route);
+
+};
   const handleSuggestedQuestion = (question) => {
     handleSendMessage(question);
   };
@@ -109,10 +201,21 @@ const useAssistant = () => {
     handleSendMessage(question);
   };
 
- const handleBackToHome = () => {
-    console.log("Back to Home");
+const handleBackToHome = () => {
+
+    console.log("BACK BUTTON PRESSED");
+
+    console.log("Before:", activeConversationId);
+
     setActiveConversationId(null);
-  };
+
+    setTimeout(() => {
+
+        console.log("After:", activeConversationId);
+
+    }, 100);
+
+};
   
     return {
     // State

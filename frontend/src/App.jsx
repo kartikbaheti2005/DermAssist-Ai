@@ -22,7 +22,7 @@ import AppointmentBookingPage from "./pages/AppointmentBookingPage";
 import ReportPage from "./pages/ReportPage";
 import ReportViewerPage from "./pages/ReportViewerPage";
 import AIAssistantPage from "./pages/AIAssistantPage";
-
+import ProfilePage from "./pages/ProfilePage";
 // Doctor Pages
 import DoctorDashboard from "./pages/DoctorDashboard";
 
@@ -101,6 +101,15 @@ function App() {
           path="/queue"
           element={<QueuePage />}
         />
+
+      <Route
+          path="/profile"
+          element={
+              <ProtectedRoute>
+                  <ProfilePage />
+              </ProtectedRoute>
+          }
+      />
 
       </Route>
 

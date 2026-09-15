@@ -4,11 +4,13 @@ import {
   Share2,
   CalendarPlus,
   MessageCircle,
+  Trash2,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
+import { deletePrediction } from "../../../api/predictionApi";
 
-const ReportActions = () => {
+const ReportActions = ({ report }) => {
   const navigate = useNavigate();
 
   const actions = [
@@ -18,7 +20,7 @@ const ReportActions = () => {
       icon: Download,
       color: "bg-sky-100 text-sky-600",
       onClick: () => {
-        console.log("Download PDF");
+        alert("PDF export will be available in Phase 6.");
       },
     },
     {
@@ -34,8 +36,63 @@ const ReportActions = () => {
       icon: Share2,
       color: "bg-green-100 text-green-600",
       onClick: () => {
-        console.log("Share Report");
+      if (navigator.clipboard) {
+      
+          navigator.clipboard.writeText(
+              `${window.location.origin}/reports/${report.id}`
+          );
+        
+          alert("Report link copied.");
+        
+      } else {
+      
+          prompt(
+              "Copy this link:",
+              `${window.location.origin}/reports/${report.id}`
+          );
+        
+      }
+
+        alert("Report link copied.");
       },
+    },
+    {
+        title: "Delete Report",
+
+        subtitle: "Remove this report permanently.",
+
+        icon: Trash2,
+
+        color: "bg-red-100 text-red-600",
+
+        onClick: async () => {
+        
+            const confirmed = window.confirm(
+            
+                "Delete this report?"
+            
+            );
+          
+            if (!confirmed) return;
+          
+            try {
+            
+                await deletePrediction(report.id);
+
+                alert("Report deleted successfully.");
+
+                navigate("/reports");
+            
+            }
+          
+            catch {
+            
+                alert("Unable to delete report.");
+            
+            }
+          
+        },
+      
     },
     {
       title: "Book Consultation",
@@ -49,7 +106,7 @@ const ReportActions = () => {
       subtitle: "Understand this report with AI assistance.",
       icon: MessageCircle,
       color: "bg-pink-100 text-pink-600",
-      onClick: () => navigate("/chatbot"),
+      onClick: () => navigate("/assistant"),
     },
   ];
 

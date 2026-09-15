@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import RiskBadge from "../RiskBadge";
 
-const ReportHeader = () => {
+const ReportHeader = ({ report }) => {
   const navigate = useNavigate();
 
   return (
@@ -21,7 +21,7 @@ const ReportHeader = () => {
           Back
         </button>
 
-        <RiskBadge risk="Low" />
+        <RiskBadge risk={report.risk} />
 
       </div>
 
@@ -40,7 +40,7 @@ const ReportHeader = () => {
           <div>
 
             <h1 className="text-3xl font-bold text-slate-800">
-              AI Skin Health Report
+              {report.disease}
             </h1>
 
             <p className="mt-1 text-slate-500">
@@ -64,7 +64,7 @@ const ReportHeader = () => {
           </p>
 
           <h3 className="mt-2 font-semibold text-slate-800">
-            RPT-2026-001
+            RPT-{report.id}
           </h3>
 
         </div>
@@ -80,7 +80,7 @@ const ReportHeader = () => {
             <CalendarDays className="h-4 w-4 text-slate-500" />
 
             <span className="font-medium">
-              26 June 2026
+              {new Date(report.createdAt).toLocaleString()}
             </span>
 
           </div>
@@ -94,7 +94,7 @@ const ReportHeader = () => {
           </p>
 
           <h3 className="mt-2 text-xl font-bold text-sky-600">
-            98.4%
+            {Number(report.confidence).toFixed(2)}%
           </h3>
 
         </div>

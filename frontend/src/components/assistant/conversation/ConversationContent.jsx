@@ -18,8 +18,14 @@ const ConversationContent = ({
       <div className="flex items-center gap-3">
         <button
           onClick={() => {
-            console.log("Back button clicked");
-            onBackToHome?.();
+              console.log("Back button clicked");
+              console.log("onBackToHome:", onBackToHome);
+          
+              if (typeof onBackToHome === "function") {
+                  onBackToHome();
+              } else {
+                  console.error("onBackToHome is NOT a function");
+              }
           }}
           className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 hover:text-blue-600"
           title="Back to Home"

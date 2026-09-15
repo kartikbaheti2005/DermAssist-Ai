@@ -20,6 +20,7 @@ from schemas.doctor import (
     DoctorLoginRequest,
     DoctorProfileUpdateRequest,
     DoctorRatingRequest,
+    DoctorResponse
 )
 
 from services.doctor_service import (
@@ -29,6 +30,11 @@ from services.doctor_service import (
     get_doctor_cities,
     update_doctor_profile,
     rate_doctor,
+    get_doctor_profile,
+)
+
+from services.doctor_dashboard_service import (
+    get_doctor_dashboard,
 )
 
 router = APIRouter(
@@ -212,3 +218,35 @@ def rate_doctor_route(
             status_code=400,
             detail=str(e),
         )
+
+@router.get(
+    "/{doctor_id}",
+    response_model=DoctorResponse,
+)
+
+@router.get("/dashboard")
+def doctor_dashboard(
+    db: Session = Depends(get_db),
+    current_doctor=Depends(get_current_doctor),
+):
+    return get_doctor_dashboard(
+        db,
+        current_doctor.id,
+    )
+
+def get_doctor(
+    doctor_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_doctor_profile(
+            db,
+            doctor_id,
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+    

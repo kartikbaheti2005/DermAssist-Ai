@@ -6,6 +6,7 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
+from models.image import Image
 from database.session import get_db
 
 from core.dependencies import (
@@ -21,6 +22,8 @@ from services.prediction_service import (
     get_prediction,
     get_user_predictions,
     delete_prediction,
+    get_prediction_explanation,
+    get_prediction_heatmap,
 )
 
 router = APIRouter(
@@ -97,6 +100,12 @@ def prediction_detail(
         current_user.id,
     )
 
+    image = (
+        db.query(Image)
+          .filter(Image.id == prediction.image_id)
+          .first()
+    )
+
     if not prediction:
 
         raise HTTPException(
@@ -104,7 +113,33 @@ def prediction_detail(
             detail="Prediction not found",
         )
 
-    return prediction.to_dict()
+    return {
+
+        **prediction.to_dict(),
+
+        "image": {
+
+            "id": image.id,
+
+            "image_path": image.image_path,
+
+            "image_name": image.image_name,
+
+            "body_part": image.body_part,
+
+            "lesion_id": image.lesion_id,
+
+            "is_followup": image.is_followup,
+
+            "uploaded_at": image.uploaded_at,
+
+            "image_format": image.image_format,
+
+            "image_size_kb": image.image_size_kb,
+
+        }
+
+    }
 
 
 # =====================================================
@@ -131,6 +166,56 @@ def delete_prediction_route(
             "message":
                 "Prediction deleted"
         }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+    
+@router.get(
+    "/predictions/{prediction_id}/explanation"
+)
+def prediction_explanation(
+    prediction_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        get_current_user,
+    ),
+):
+    try:
+
+        return get_prediction_explanation(
+            db,
+            prediction_id,
+            current_user.id,
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+    
+@router.get(
+    "/predictions/{prediction_id}/heatmap"
+)
+def prediction_heatmap(
+    prediction_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        get_current_user,
+    ),
+):
+    try:
+
+        return get_prediction_heatmap(
+            db,
+            prediction_id,
+            current_user.id,
+        )
 
     except ValueError as e:
 

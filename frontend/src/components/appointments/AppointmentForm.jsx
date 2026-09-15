@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createAppointment } from "../../api/appointmentApi";
 
 const AppointmentForm = ({ doctor }) => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const AppointmentForm = ({ doctor }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
@@ -39,15 +40,28 @@ const AppointmentForm = ({ doctor }) => {
 
     setLoading(true);
 
-    setTimeout(() => {
+    setSuccess(false);
 
-        console.log("Appointment Payload:", payload);
+    try {
 
-        setLoading(false);
+        await createAppointment(payload);
 
         setSuccess(true);
 
-    }, 1200);
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error?.response?.data?.detail ||
+            "Failed to book appointment."
+        );
+
+    } finally {
+
+        setLoading(false);
+
+    }
 
 };
 

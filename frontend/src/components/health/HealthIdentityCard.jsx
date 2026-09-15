@@ -1,3 +1,4 @@
+import useAuth from "../../hooks/useAuth";
 import {
   User,
   CalendarDays,
@@ -7,14 +8,26 @@ import {
 
 const HealthIdentityCard = ({data}) => {
 
+
+  const { user } = useAuth();
+
   const patient = {
-    name: data?.name || "Kartik",
-    patientId: `DA-${new Date().getFullYear()}-001`,
-    age: data?.age,
-    gender: data?.gender,
-    bloodGroup: data?.bloodGroup,
-    healthStatus: data?.healthStatus || "Healthy",
-    lastScan: "2 Days Ago",
+      name: user?.full_name,
+      patientId: `DA-${user?.id}`,
+      age: user?.date_of_birth
+          ? new Date().getFullYear() -
+            new Date(user.date_of_birth).getFullYear()
+          : "--",
+
+      gender: user?.gender || "--",
+
+      bloodGroup:
+          data?.blood_group || "--",
+
+      healthStatus: "Healthy",
+
+      lastScan:
+          data?.record_date || "--",
   };
 
   return (

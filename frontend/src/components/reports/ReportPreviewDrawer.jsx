@@ -9,8 +9,8 @@ const ReportPreviewDrawer = ({
   open,
   onClose,
 }) => {
-  if (!open || !report) return null;
   const navigate = useNavigate();
+  if (!open || !report) return null;
   return (
     <>
       {/* Overlay */}

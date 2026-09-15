@@ -7,7 +7,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
-const PatientInfoCard = () => {
+const PatientInfoCard = ({ report }) => {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
@@ -24,37 +24,37 @@ const PatientInfoCard = () => {
         <InfoItem
           icon={User}
           label="Patient Name"
-          value="Krish Baheti"
+          value={report.patient.name}
         />
 
         <InfoItem
           icon={Calendar}
           label="Age"
-          value="21 Years"
+          value={report.patient.dob || "Not Provided"}
         />
 
         <InfoItem
           icon={BadgeCheck}
           label="Gender"
-          value="Male"
+          value={report.patient.gender}
         />
 
         <InfoItem
           icon={Droplets}
           label="Blood Group"
-          value="O+"
+          value={report.patient.bloodGroup}
         />
 
         <InfoItem
           icon={Phone}
           label="Phone"
-          value="+91 XXXXX XXXXX"
+          value={report.patient.phone}
         />
 
         <InfoItem
           icon={Mail}
           label="Email"
-          value="krish@example.com"
+          value={report.patient.email}
         />
 
       </div>
