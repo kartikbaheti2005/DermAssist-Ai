@@ -1,0 +1,81 @@
+Module,Endpoint,Structure,Phase,Priority
+Authentication,POST /auth/register,Existing,4,Critical
+Authentication,POST /auth/login,Improve Existing,4,Critical
+Authentication,POST /auth/forgot-password,Existing,4,High
+Authentication,POST /auth/reset-password,Improve Existing,4,High
+Authentication,GET /auth/me,New,4,Critical
+Authentication,POST /auth/logout,New,4,Critical
+Authentication,POST /auth/change-password,New,4,Critical
+Authentication,POST /auth/refresh-token,New,4,High
+Authentication,POST /auth/verify-email,Future,5,Medium
+Authentication,POST /auth/resend-verification,Future,5,Medium
+Dashboard,GET /dashboard/summary,New,4,Critical
+Users,GET /users/me,New,4,High
+Users,PUT /users/me,New,4,High
+Users,PUT /users/avatar,Future,5,Low
+Users,DELETE /users/avatar,Future,5,Low
+Users,DELETE /users/account,New,4,High
+Doctors,POST /doctors/register,Existing,4,Critical
+Doctors,POST /doctors/login,Existing,4,Critical
+Doctors,GET /doctors,Improve Existing,4,Critical
+Doctors,GET /doctors/cities,Existing,4,Medium
+Doctors,GET /doctors/me,Existing,4,High
+Doctors,PUT /doctors/profile,Existing,4,High
+Doctors,POST /doctors/rate,Existing,4,Medium
+Doctors,GET /doctors/{doctor_id},New,4,High
+Doctors,GET /doctors/{doctor_id}/availability,New,4,High
+Doctors,GET /doctors/{doctor_id}/slots,New,4,High
+Doctors,GET /doctors/{doctor_id}/calendar,New,4,Medium
+Appointments,POST /appointments,Existing,4,Critical
+Appointments,GET /appointments/my,Existing,4,Critical
+Appointments,GET /appointments/{appointment_id},New,4,High
+Appointments,PUT /appointments/{appointment_id}/cancel,Existing,4,High
+Appointments,PUT /appointments/{appointment_id}/reschedule,New,4,High
+Appointments,DELETE /appointments/{appointment_id},New,4,Medium
+Appointments,GET /appointments/available-slots/{doctor_id},New,4,Critical
+Appointments,GET /appointments/{appointment_id}/timeline,New,4,Medium
+Appointments,POST /appointments/{appointment_id}/check-in,New,4,Medium
+Queue,POST /queue/join,New,4,Medium
+Queue,GET /queue/me,New,4,Medium
+Queue,GET /queue/history,New,4,Low
+Queue,POST /queue/refresh,New,4,Low
+Health Records,GET /health-records,Existing,4,Critical
+Health Records,POST /health-records,Existing,4,Critical
+Health Records,GET /health-records/latest,Existing,4,High
+Health Records,GET /health-records/{record_id},Existing,4,High
+Health Records,PUT /health-records/{record_id},Existing,4,High
+Health Records,DELETE /health-records/{record_id},Existing,4,Medium
+Health Records,GET /health-records/analytics,Merge,4,High
+Images,POST /images/upload,Existing,4,High
+Images,GET /images,Existing,4,High
+Images,GET /images/{image_id},Existing,4,High
+Images,GET /images/lesion/{lesion_id},Existing,4,Medium
+Images,DELETE /images/{image_id},Existing,4,Medium
+Images,GET /images/{image_id}/metadata,New,4,Medium
+Images,GET /images/timeline,New,4,Medium
+Predictions,POST /predict,Existing,4,Critical
+Predictions,GET /predictions,Existing,4,Critical
+Predictions,GET /predictions/{prediction_id},Existing,4,High
+Predictions,DELETE /predictions/{prediction_id},Existing,4,Medium
+Predictions,GET /predictions/analytics,Merge,4,High
+Reports,GET /reports/dashboard,Existing,4,High
+Reports,GET /reports,New,4,Critical
+Reports,GET /reports/{report_id},New,4,High
+Reports,GET /reports/export,New,4,Medium
+Reports,POST /reports/{report_id}/share,New,4,Medium
+Recommendations,GET /recommendations/prediction/{prediction_id},Existing,4,High
+Recommendations,GET /recommendations/history,New,4,Low
+Chatbot,POST /chatbot/message,Existing,4,High
+Chatbot,GET /chatbot/health,Existing,4,Low
+Chatbot,GET /chatbot/conversations,New,4,Medium
+Chatbot,POST /chatbot/conversations,New,4,Medium
+Outbreak,GET /outbreaks,Existing,4,Medium
+Outbreak,GET /outbreaks/trending,Existing,4,Medium
+Outbreak,GET /outbreaks/alerts,Existing,4,Medium
+Outbreak,POST /outbreaks/generate,Existing,4,Medium
+Outbreak,GET /outbreaks/history,New,4,Low
+Notifications,GET /notifications,Future,5,Medium
+Preferences,GET /preferences,Future,6,Low
+Search,GET /search,Removed,-,Low
+Doctor Dashboard,GET /doctor/dashboard,New,4,Medium
+Admin,GET /admin/users,New,4,Medium

@@ -189,6 +189,24 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    health_records = relationship(
+        "HealthRecord",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    chat_conversations = relationship(
+        "ChatConversation",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    notifications = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
     # -------------------------
     # Password Helpers
     # -------------------------

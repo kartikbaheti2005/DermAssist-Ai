@@ -1,0 +1,29 @@
+                    User Upload
+                         │
+                         ▼
+               Image Quality Check
+                         │
+                         ▼
+                 Lesion Detection
+                         │
+                         ▼
+               Cancer Screening AI
+                   (Dataset A)
+                  ┌─────────────┐
+             High │             │ Low
+        Suspicion │             │ Suspicion
+                  ▼             ▼
+     Cancer Classification   General Disease Classification
+         (Dataset A)               (Dataset B)
+                  └─────────────┬─────────────┘
+                                ▼
+                       Patient Metadata
+                                ▼
+                  Previous Image Comparison
+                         (Dataset C)
+                                ▼
+                    Risk Assessment Engine
+                                ▼
+                         Medical LLM
+                                ▼
+                    Clinical Report & AI Assistant

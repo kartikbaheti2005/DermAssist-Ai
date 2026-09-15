@@ -1,0 +1,109 @@
+| Module                    | Endpoint                                         | Structure  | Phase | Priority |
+| ------------------------- | ------------------------------------------------ | ---------- | :---: | :------: |
+| **System**                | GET /                                            | ✅ Existing |   4   |    🔴    |
+|                           | GET /health                                      | ✅ Existing |   4   |    🔴    |
+| **Authentication**        | POST /auth/register                              | 🟡 Improve |   4   |    🔴    |
+|                           | POST /auth/login                                 | 🟡 Improve |   4   |    🔴    |
+|                           | POST /auth/forgot-password                       | 🟡 Improve |   4   |    🔴    |
+|                           | POST /auth/reset-password                        | 🟡 Improve |   4   |    🔴    |
+|                           | GET /auth/me                                     | 🟢 New     |   4   |    🔴    |
+|                           | POST /auth/logout                                | 🟢 New     |   4   |    🔴    |
+|                           | POST /auth/change-password                       | 🟢 New     |   4   |    🔴    |
+|                           | POST /auth/refresh-token                         | 🟢 New     |   4   |    🟠    |
+|                           | POST /auth/verify-email                          | ⏳ Future   |   5   |    🟡    |
+|                           | POST /auth/resend-verification                   | ⏳ Future   |   5   |    🟡    |
+| **Dashboard**             | GET /dashboard/summary                           | 🟢 New     |   4   |    🔴    |
+| **User**                  | GET /users/me                                    | 🟢 New     |   4   |    🟠    |
+|                           | PUT /users/me                                    | 🟢 New     |   4   |    🟠    |
+|                           | DELETE /users/account                            | 🟢 New     |   4   |    🟠    |
+| **Doctors**               | POST /doctors/register                           | ✅ Existing |   4   |    🔴    |
+|                           | POST /doctors/login                              | ✅ Existing |   4   |    🔴    |
+|                           | GET /doctors                                     | 🟡 Improve |   4   |    🔴    |
+|                           | GET /doctors/{doctor_id}                         | 🟢 New     |   4   |    🔴    |
+|                           | GET /doctors/cities                              | ✅ Existing |   4   |    🟠    |
+|                           | GET /doctors/me                                  | ✅ Existing |   4   |    🟠    |
+|                           | PUT /doctors/profile                             | 🟡 Improve |   4   |    🟠    |
+|                           | POST /doctors/rate                               | 🟡 Improve |   4   |    🟠    |
+|                           | GET /doctors/{doctor_id}/availability            | 🟢 New     |   4   |    🔴    |
+|                           | GET /doctors/{doctor_id}/slots                   | 🟢 New     |   4   |    🔴    |
+|                           | GET /doctors/{doctor_id}/calendar                | 🟢 New     |   4   |    🟡    |
+| **Appointments**          | POST /appointments                               | 🟡 Improve |   4   |    🔴    |
+|                           | GET /appointments/my                             | 🟡 Improve |   4   |    🔴    |
+|                           | GET /appointments/{appointment_id}               | 🟢 New     |   4   |    🔴    |
+|                           | PUT /appointments/{appointment_id}/cancel        | ✅ Existing |   4   |    🔴    |
+|                           | PUT /appointments/{appointment_id}/reschedule    | 🟢 New     |   4   |    🔴    |
+|                           | DELETE /appointments/{appointment_id}            | 🟢 New     |   4   |    🟠    |
+|                           | GET /appointments/available-slots/{doctor_id}    | 🟢 New     |   4   |    🔴    |
+|                           | GET /appointments/{appointment_id}/timeline      | 🟢 New     |   4   |    🟡    |
+|                           | POST /appointments/{appointment_id}/check-in     | 🟢 New     |   4   |    🟡    |
+| **Queue**                 | POST /queue/join                                 | 🟢 New     |   4   |    🟠    |
+|                           | GET /queue/me                                    | 🟢 New     |   4   |    🟠    |
+|                           | GET /queue/history                               | 🟢 New     |   4   |    🟡    |
+|                           | POST /queue/refresh                              | 🟢 New     |   4   |    🟡    |
+| **Doctor Dashboard**      | GET /doctor/appointments                         | ✅ Existing |   4   |    🔴    |
+|                           | PUT /doctor/appointments/{appointment_id}/status | ✅ Existing |   4   |    🔴    |
+|                           | GET /doctor/dashboard                            | 🟢 New     |   4   |    🟠    |
+|                           | GET /doctor/patients                             | 🟢 New     |   4   |    🟠    |
+|                           | GET /doctor/reports                              | 🟢 New     |   4   |    🟡    |
+|                           | GET /doctor/statistics                           | 🟢 New     |   4   |    🟡    |
+|                           | GET /doctor/availability                         | 🟢 New     |   4   |    🟠    |
+|                           | PUT /doctor/availability                         | 🟢 New     |   4   |    🟠    |
+| **Health Records**        | POST /health-records                             | ✅ Existing |   4   |    🔴    |
+|                           | GET /health-records                              | 🟡 Improve |   4   |    🔴    |
+|                           | GET /health-records/latest                       | ✅ Existing |   4   |    🟠    |
+|                           | GET /health-records/{record_id}                  | ✅ Existing |   4   |    🟠    |
+|                           | PUT /health-records/{record_id}                  | ✅ Existing |   4   |    🟠    |
+|                           | DELETE /health-records/{record_id}               | ✅ Existing |   4   |    🟠    |
+|                           | GET /health-records/analytics                    | 🟢 New     |   4   |    🔴    |
+|                           | GET /health-records/export                       | 🟢 New     |   4   |    🟡    |
+| **Images**                | POST /images/upload                              | 🟡 Improve |   4   |    🔴    |
+|                           | GET /images                                      | 🟡 Improve |   4   |    🟠    |
+|                           | GET /images/{image_id}                           | ✅ Existing |   4   |    🟠    |
+|                           | GET /images/lesion/{lesion_id}                   | ✅ Existing |   4   |    🟠    |
+|                           | DELETE /images/{image_id}                        | ✅ Existing |   4   |    🟠    |
+|                           | GET /images/{image_id}/metadata                  | 🟢 New     |   4   |    🟠    |
+|                           | GET /images/timeline                             | 🟢 New     |   4   |    🟡    |
+| **Predictions**           | POST /predict                                    | 🟡 Improve |   4   |    🔴    |
+|                           | GET /predictions                                 | 🟡 Improve |   4   |    🔴    |
+|                           | GET /predictions/{prediction_id}                 | 🟡 Improve |   4   |    🟠    |
+|                           | DELETE /predictions/{prediction_id}              | ✅ Existing |   4   |    🟠    |
+|                           | GET /predictions/analytics                       | 🟢 New     |   4   |    🟠    |
+|                           | GET /predictions/{prediction_id}/explanation     | ⏳ Future   |   7   |    🟡    |
+| **Reports**               | GET /reports/dashboard                           | ✅ Existing |   4   |    🔴    |
+|                           | GET /reports                                     | 🟢 New     |   4   |    🔴    |
+|                           | GET /reports/{report_id}                         | 🟢 New     |   4   |    🔴    |
+|                           | GET /reports/export                              | 🟢 New     |   4   |    🟠    |
+|                           | POST /reports/{report_id}/share                  | 🟢 New     |   4   |    🟠    |
+| **Recommendations**       | GET /recommendations/prediction/{prediction_id}  | 🟡 Improve |   4   |    🟠    |
+|                           | GET /recommendations/history                     | 🟢 New     |   4   |    🟡    |
+|                           | GET /recommendations/explanation                 | ⏳ Future   |   7   |    🟡    |
+| **Chatbot**               | POST /chatbot/message                            | 🟡 Improve |   4   |    🔴    |
+|                           | GET /chatbot/health                              | ✅ Existing |   4   |    🟠    |
+|                           | GET /chatbot/conversations                       | 🟢 New     |   4   |    🟠    |
+|                           | POST /chatbot/conversations                      | 🟢 New     |   4   |    🟠    |
+|                           | GET /chatbot/conversations/{conversation_id}     | 🟢 New     |   4   |    🟠    |
+|                           | PATCH /chatbot/conversations/{conversation_id}   | 🟢 New     |   4   |    🟠    |
+|                           | DELETE /chatbot/conversations/{conversation_id}  | 🟢 New     |   4   |    🟠    |
+| **AI Assistant**          | GET /assistant/context                           | ⏳ Future   |   7   |    🟡    |
+|                           | GET /assistant/suggestions                       | ⏳ Future   |   7   |    🟡    |
+|                           | POST /assistant/chat                             | ⏳ Future   |   7   |    🔴    |
+|                           | POST /assistant/feedback                         | ⏳ Future   |   7   |    🟡    |
+| **Outbreak Intelligence** | GET /outbreaks                                   | 🟡 Improve |   4   |    🔴    |
+|                           | GET /outbreaks/trending                          | 🟡 Improve |   4   |    🟠    |
+|                           | GET /outbreaks/alerts                            | 🟡 Improve |   4   |    🟠    |
+|                           | POST /outbreaks/generate                         | 🟡 Improve |   4   |    🟠    |
+|                           | GET /outbreaks/history                           | 🟢 New     |   4   |    🟡    |
+|                           | GET /outbreaks/weather                           | 🟢 New     |   4   |    🟟    |
+|                           | GET /outbreaks/heatmap                           | 🟢 New     |   4   |    🟟    |
+| **Notifications**         | GET /notifications                               | ⏳ Future   |   5   |    🟡    |
+|                           | PATCH /notifications/{notification_id}/read      | ⏳ Future   |   5   |    🟡    |
+|                           | PATCH /notifications/read-all                    | ⏳ Future   |   5   |    🟡    |
+|                           | DELETE /notifications/{notification_id}          | ⏳ Future   |   5   |    🟢    |
+| **Preferences**           | GET /preferences                                 | ⏳ Future   |   6   |    🟢    |
+|                           | PUT /preferences                                 | ⏳ Future   |   6   |    🟢    |
+| **Admin**                 | GET /admin/doctors                               | 🟡 Improve |   4   |    🔴    |
+|                           | PUT /admin/doctors/{doctor_id}/approve           | 🟡 Improve |   4   |    🔴    |
+|                           | PUT /admin/doctors/{doctor_id}/reject            | 🟡 Improve |   4   |    🔴    |
+|                           | DELETE /admin/doctors/{doctor_id}                | 🟡 Improve |   4   |    🟠    |
+|                           | GET /admin/users                                 | 🟢 New     |   4   |    🟠    |
+|                           | GET /admin/statistics                            | 🟢 New     |   4   |    🟡    |

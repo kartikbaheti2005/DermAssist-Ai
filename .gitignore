@@ -28,3 +28,10 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Project Specific
+zip/
+code done.txt
+info.txt
+backend/core/code.txt
+backend/ml_models/docs/
