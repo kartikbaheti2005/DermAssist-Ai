@@ -2,12 +2,10 @@ import {
   CalendarDays,
   Brain,
   ChevronRight,
-  UserRound,
   Percent,
 } from "lucide-react";
 
 import RiskBadge from "./RiskBadge";
-import { useNavigate } from "react-router-dom";
 
 const ReportCard = ({ report, onClick }) => {
     return (
@@ -35,11 +33,7 @@ const ReportCard = ({ report, onClick }) => {
         {/* Left Section */}
         <div className="flex flex-1 gap-4">
 
-          <img
-            src="https://placehold.co/120x120?text=Skin"
-            alt={report.title}
-            className="h-24 w-24 rounded-xl object-cover"
-          />
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-center text-xs text-slate-500">Skin scan<br />report</div>
 
           <div className="flex-1">
 
@@ -48,7 +42,7 @@ const ReportCard = ({ report, onClick }) => {
             </span>
 
             <h3 className="mt-1 text-lg font-semibold text-slate-800">
-              {report.title}
+              {report.disease || "Skin screening"}
             </h3>
 
             <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-500">
@@ -60,15 +54,12 @@ const ReportCard = ({ report, onClick }) => {
 
               <div className="flex items-center gap-1">
                 <CalendarDays className="h-4 w-4" />
-                {new Date(report.date).toLocaleDateString()}
+                {report.scanDate || "Date unavailable"}
               </div>
 
             </div>
 
-            <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-              <UserRound className="h-4 w-4" />
-              DermAssist AI
-            </div>
+            <div className="mt-3 text-sm text-slate-500">Screening report</div>
 
           </div>
 
@@ -77,7 +68,7 @@ const ReportCard = ({ report, onClick }) => {
         {/* Right Section */}
         <div className="flex flex-col items-end justify-between gap-4">
 
-          <RiskBadge risk={report.riskLevel} />
+          <RiskBadge risk={report.risk} />
 
           <div className="flex items-center gap-2 text-sm font-medium text-sky-600">
 

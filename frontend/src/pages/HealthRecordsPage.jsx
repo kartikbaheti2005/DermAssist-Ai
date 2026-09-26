@@ -30,6 +30,8 @@ const HealthRecordsPage = () => {
   const [loading, setLoading] = useState(true);
   const [showWizard, setShowWizard] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
   
@@ -57,6 +59,7 @@ const HealthRecordsPage = () => {
         "Failed to load health record",
         error
       );
+      setLoadError("Health records could not be loaded. Please try again.");
     
     } finally {
     
@@ -85,6 +88,10 @@ const HealthRecordsPage = () => {
 }
 
   // Empty State
+  if (loadError && !hasHealthRecord && !showWizard) {
+    return <div role="alert" className="space-y-3 rounded-xl border border-rose-200 bg-rose-50 p-5 text-rose-800">{loadError}<button onClick={() => window.location.reload()} className="block font-semibold underline">Retry</button></div>;
+  }
+
   if (!hasHealthRecord && !showWizard) {
 
     return (
@@ -103,6 +110,7 @@ const HealthRecordsPage = () => {
     return (
   <HealthProfileWizard
     initialData={editing ? healthData : null}
+    error={saveError}
     onComplete={async (data) => {
       const payload = {
         height_cm:
@@ -148,9 +156,13 @@ const HealthRecordsPage = () => {
         setHasHealthRecord(true);
         setShowWizard(false);
         setEditing(false);
+        setSaveError("");
+        return true;
 
       } catch (error) {
         console.error(error);
+        setSaveError("Your changes could not be saved. Please try again.");
+        return false;
       }
     }}
   />
@@ -182,7 +194,7 @@ const HealthRecordsPage = () => {
           setShowWizard(true);
         }}
         className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-      >
+  >
         Edit Health Profile
       </button>
 

@@ -12,6 +12,10 @@ const ReportPage = () => {
     const [selectedReport, setSelectedReport] = useState(null);
 
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
+    const [query, setQuery] = useState("");
+    const [activeFilter, setActiveFilter] = useState("All");
 
     const loadReports = async () => {
 
@@ -26,32 +30,13 @@ const ReportPage = () => {
                         
                 disease: item.predicted_label,
                         
-                confidence: item.confidence_score,
+                confidence: Number(item.confidence_score) <= 1 ? Number(item.confidence_score) * 100 : Number(item.confidence_score),
                         
                 risk: item.risk_level,
                         
                 scanDate: new Date(
                     item.created_at
                 ).toLocaleDateString(),
-              
-                image:
-                    "https://placehold.co/600x400?text=Skin+Analysis",
-              
-                doctor: {
-                
-                    name: "DermAssist AI",
-                
-                    specialization: "AI Dermatology Copilot",
-                
-                },
-              
-                aiSummary:
-                    item.predicted_label ===
-                    "Model Not Connected"
-              
-                        ? "AI model integration is scheduled for Phase 6."
-              
-                        : `The AI detected ${item.predicted_label}.`,
               
                 predictionId: item.id,
               
@@ -64,6 +49,9 @@ const ReportPage = () => {
         } catch (err) {
         
             console.error(err);
+            setLoadError("Reports could not be loaded. Please try again.");
+        } finally {
+            setLoading(false);
         
         }
       
@@ -92,16 +80,22 @@ const ReportPage = () => {
       <ReportStats />
 
       {/* Filters */}
-      <ReportFilters />
+      <ReportFilters query={query} onQueryChange={setQuery} activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
       {/* Report List */}
-      <ReportList
-          reports={reports}
-          onSelect={(report) => {
-            setSelectedReport(report);
-            setDrawerOpen(true);
-          }}
-        />
+      {loading ? <p className="py-8 text-center text-slate-500">Loading reports…</p> : loadError ? <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800">{loadError}<button onClick={loadReports} className="ml-3 font-semibold underline">Retry</button></div> : <ReportList
+        reports={reports.filter((report) => {
+          const matchesQuery = `${report.disease} ${report.id}`.toLowerCase().includes(query.toLowerCase());
+          const risk = (report.risk || "").toLowerCase();
+          const isRecent = report.raw?.created_at && Date.now() - new Date(report.raw.created_at).getTime() <= 30 * 24 * 60 * 60 * 1000;
+          const matchesRisk = activeFilter === "All" || (activeFilter === "Recent" && isRecent) || risk === activeFilter.toLowerCase().replace(" risk", "");
+          return matchesQuery && matchesRisk;
+        })}
+        onSelect={(report) => {
+          setSelectedReport(report);
+          setDrawerOpen(true);
+        }}
+      />}
        
        <ReportPreviewDrawer
           report={selectedReport}

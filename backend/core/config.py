@@ -96,6 +96,12 @@ GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY"
 )
 
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").strip().lower()
+LLM_MODEL = os.getenv("LLM_MODEL", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 
 # ==========================
 # Uploads
@@ -113,8 +119,18 @@ UPLOAD_DIR = os.getenv(
 
 MODEL_PATH = os.getenv(
     "MODEL_PATH",
-    "ml_models/best_model.pth"
+    str(BASE_DIR / "ml_models" / "weights" / "dermassist_b0_v1.pth")
 )
+
+MODEL_VERSION = os.getenv(
+    "MODEL_VERSION",
+    "dermassist-b0-v1"
+)
+
+MODEL_THRESHOLD = float(os.getenv(
+    "MODEL_THRESHOLD",
+    "0.50"
+))
 
 STAGE2_MODEL_PATH = os.getenv(
     "STAGE2_MODEL_PATH",

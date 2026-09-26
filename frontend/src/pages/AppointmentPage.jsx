@@ -15,10 +15,13 @@ const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const [activeFilter, setActiveFilter] = useState("All");
 
   const loadAppointments = async () => {
+       setLoadError("");
+       setLoading(true);
           
        try {
       
@@ -48,16 +51,16 @@ const AppointmentsPage = () => {
           mapped.sort((a, b) => {
           
                   const statusDiff =
-                      statusOrder[a.status] -
-                      statusOrder[b.status];
+                      (statusOrder[a.status] ?? 5) -
+                      (statusOrder[b.status] ?? 5);
 
                   if (statusDiff !== 0) {
                       return statusDiff;
                   }
                 
-                  const dateA = new Date('${a.date} ${a.time}');
+                  const dateA = new Date(`${a.date}T${a.time || "00:00"}`);
                 
-                  const dateB = new Date('${b.date} ${b.time}');
+                  const dateB = new Date(`${b.date}T${b.time || "00:00"}`);
                 
                   return dateA - dateB;
               });
@@ -67,6 +70,7 @@ const AppointmentsPage = () => {
             } catch (error) {
             
                 console.error(error);
+                setLoadError("Appointments could not be loaded. Please try again.");
             
             } finally {
             
@@ -106,9 +110,8 @@ const AppointmentsPage = () => {
         if (
             activeFilter === "Upcoming"
         ) {
-            return (
-                appointment.status === "confirmed"
-            );
+            const start = new Date(`${appointment.date}T${appointment.time || "00:00"}`);
+            return ["pending", "confirmed"].includes(appointment.status) && start >= new Date();
         }
 
         return (
@@ -130,6 +133,8 @@ const AppointmentsPage = () => {
           Manage, track and review all your dermatology consultations.
         </p>
       </div>
+
+      {loadError && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800">{loadError}<button onClick={loadAppointments} className="ml-3 font-semibold underline">Retry</button></div>}
 
       {/* Next Appointment Banner */}
       <NextAppointmentBanner 

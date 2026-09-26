@@ -1,13 +1,12 @@
 import { Search } from "lucide-react";
 
-const ReportFilters = () => {
+const ReportFilters = ({ query = "", onQueryChange = () => {}, activeFilter = "All", onFilterChange = () => {} }) => {
   const filters = [
     "All",
     "Recent",
     "High Risk",
     "Medium Risk",
     "Low Risk",
-    "Saved",
   ];
 
   return (
@@ -18,6 +17,8 @@ const ReportFilters = () => {
 
         <input
           type="text"
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
           placeholder="Search reports..."
           className="
             w-full
@@ -39,9 +40,11 @@ const ReportFilters = () => {
 
       {/* Filter Pills */}
       <div className="flex flex-wrap gap-2">
-        {filters.map((filter, index) => (
+        {filters.map((filter) => (
           <button
             key={filter}
+            type="button"
+            onClick={() => onFilterChange(filter)}
             className={`
               rounded-full
               px-4
@@ -50,7 +53,7 @@ const ReportFilters = () => {
               font-medium
               transition-all
               ${
-                index === 0
+                activeFilter === filter
                   ? "bg-sky-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }

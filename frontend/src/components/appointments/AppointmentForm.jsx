@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createAppointment } from "../../api/appointmentApi";
+import { createAppointment, getAvailableSlots } from "../../api/appointmentApi";
 
 const AppointmentForm = ({ doctor }) => {
   const navigate = useNavigate();
@@ -14,6 +14,25 @@ const AppointmentForm = ({ doctor }) => {
   const [loading, setLoading] = useState(false);
 
   const [success, setSuccess] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [slotLoading, setSlotLoading] = useState(false);
+  const [slotError, setSlotError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    setAvailableSlots([]);
+    setSlotError("");
+    if (!doctor?.id || !formData.appointment_date) return () => { active = false; };
+    setSlotLoading(true);
+    getAvailableSlots(doctor.id, formData.appointment_date)
+      .then((result) => { if (active) setAvailableSlots(result.slots || []); })
+      .catch((error) => {
+        if (active) setSlotError(error?.response?.data?.detail || "Available times could not be loaded.");
+      })
+      .finally(() => { if (active) setSlotLoading(false); });
+    return () => { active = false; };
+  }, [doctor?.id, formData.appointment_date]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,6 +60,7 @@ const AppointmentForm = ({ doctor }) => {
     setLoading(true);
 
     setSuccess(false);
+    setSubmitError("");
 
     try {
 
@@ -52,10 +72,7 @@ const AppointmentForm = ({ doctor }) => {
 
         console.error(error);
 
-        alert(
-            error?.response?.data?.detail ||
-            "Failed to book appointment."
-        );
+        setSubmitError(error?.response?.data?.detail || "Failed to book appointment.");
 
     } finally {
 
@@ -106,6 +123,7 @@ const AppointmentForm = ({ doctor }) => {
     </div>
 
 )}
+        {submitError && <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-800">{submitError}</p>}
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700">
             Appointment Date
@@ -114,6 +132,7 @@ const AppointmentForm = ({ doctor }) => {
           <input
             type="date"
             name="appointment_date"
+            min={new Date().toISOString().slice(0, 10)}
             value={formData.appointment_date}
             onChange={handleChange}
             required
@@ -126,14 +145,20 @@ const AppointmentForm = ({ doctor }) => {
             Appointment Time
           </label>
 
-          <input
-            type="time"
+          <select
             name="appointment_time"
             value={formData.appointment_time}
             onChange={handleChange}
             required
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-sky-500"
-          />
+            disabled={!formData.appointment_date || slotLoading || availableSlots.filter((slot) => slot.available).length === 0}
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-sky-500 disabled:bg-slate-100"
+          >
+            <option value="">{slotLoading ? "Loading available times…" : !formData.appointment_date ? "Select a date first" : "Choose an available time"}</option>
+            {availableSlots.filter((slot) => slot.available).map((slot) => <option key={slot.time} value={slot.time}>{slot.time}</option>)}
+          </select>
+          {slotError && <div role="alert" className="mt-2 text-sm text-rose-700">{slotError} Choose another date to retry.</div>}
+          {!slotLoading && formData.appointment_date && !slotError && availableSlots.length === 0 && <p className="mt-2 text-sm text-slate-600">No appointment times are listed for this doctor.</p>}
+          {!slotLoading && formData.appointment_date && !slotError && availableSlots.length > 0 && availableSlots.every((slot) => !slot.available) && <p className="mt-2 text-sm text-slate-600">No times are available on this date. Choose another day.</p>}
         </div>
 
         <div>
@@ -169,7 +194,7 @@ const AppointmentForm = ({ doctor }) => {
 
         <button
           type="submit"
-          disabled={!doctor || loading}
+          disabled={!doctor || loading || slotLoading || !formData.appointment_time}
           className="w-full rounded-xl bg-sky-600 py-3 font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           {loading

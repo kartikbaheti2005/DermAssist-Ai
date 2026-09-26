@@ -2,12 +2,15 @@
 // Imports
 // ===============================
 
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MobileBottomNav from "./MobileBottomNav";
 import Breadcrumb from "./Breadcrumb";
+import RouteTransition from "../common/RouteTransition";
+import RouteLoading from "../common/RouteLoading";
 
 // ===============================
 // Component
@@ -33,7 +36,7 @@ const DashboardLayout = () => {
 
                 <Breadcrumb />
 
-                <Outlet />
+                <RouteTransition><Suspense fallback={<RouteLoading />}><Outlet /></Suspense></RouteTransition>
 
             </div>
 

@@ -9,6 +9,7 @@ import {
 
 import AppointmentStatusBadge from "./AppointmentStatusBadge";
 import { cancelAppointment } from "../../api/appointmentApi";
+import { useState } from "react";
 
 const AppointmentDetailsDrawer = ({
   appointment,
@@ -16,6 +17,8 @@ const AppointmentDetailsDrawer = ({
   onClose,
   onRefresh,
 }) => {
+    const [cancelError, setCancelError] = useState("");
+    const [canceling, setCanceling] = useState(false);
     const handleCancel = async () => {
 
       const confirmed = window.confirm(
@@ -23,6 +26,8 @@ const AppointmentDetailsDrawer = ({
       );
 
       if (!confirmed) return;
+      setCancelError("");
+      setCanceling(true);
 
       try {
 
@@ -41,11 +46,10 @@ const AppointmentDetailsDrawer = ({
       } catch (error) {
 
           console.error(error);
+          setCancelError(error?.response?.data?.detail || "Unable to cancel this appointment. Please try again.");
 
-          // alert(
-          //     "Unable to cancel appointment."
-          // );
-
+      } finally {
+          setCanceling(false);
       }
 
   };
@@ -174,13 +178,15 @@ const AppointmentDetailsDrawer = ({
 
         </div>
 
-        <div className="mt-8 flex gap-3">
+        {cancelError && <p role="alert" className="mx-6 mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-800">{cancelError}</p>}
 
-          {appointment.status !==
-              "cancelled" && (
+        <div className="mt-8 flex gap-3 px-6 pb-6">
+
+          {!['cancelled', 'completed'].includes(appointment.status) && (
               
               <button
                   onClick={handleCancel}
+                  disabled={canceling}
                   className="
                       flex-1
                       rounded-xl
@@ -191,7 +197,7 @@ const AppointmentDetailsDrawer = ({
                       hover:bg-red-700
                   "
               >
-                  Cancel Appointment
+                  {canceling ? "Cancelling…" : "Cancel Appointment"}
               </button>
 
           )}

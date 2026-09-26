@@ -1,159 +1,45 @@
-// ===============================
-// Imports
-// ===============================
-
-import {
-  HeartPulse,
-  Droplets,
-  Ruler,
-  Weight,
-  CalendarClock,
-  ArrowRight,
-} from "lucide-react";
-
+import { Link } from "react-router-dom";
+import { ArrowRight, CalendarClock, Droplets, HeartPulse, Ruler, Weight } from "lucide-react";
 import Card from "../common/Card";
-import Button from "../common/Button";
 
-// ===============================
-// Component
-// ===============================
+const display = (value, suffix = "") => value === null || value === undefined || value === "" ? "Not added" : `${value}${suffix}`;
+const HealthItem = ({ icon: Icon, title, value }) => (
+  <div className="rounded-xl bg-slate-50 p-4">
+    <Icon size={18} className="mb-3 text-blue-700" aria-hidden="true" />
+    <p className="text-xs font-medium text-slate-500">{title}</p>
+    <p className="mt-1 break-words text-base font-semibold text-slate-800">{value}</p>
+  </div>
+);
 
-const HealthCard = () => {
-
-  // Temporary Data
-  const health = {
-    bmi: "23.4",
-    bloodGroup: "B+",
-    height: "174 cm",
-    weight: "68 kg",
-    updated: "Today",
-  };
+const HealthCard = ({ record, profile, loading }) => {
+  const height = record?.height_cm ?? profile?.height_cm;
+  const weight = record?.weight_kg ?? profile?.weight_kg;
+  const bmi = record?.bmi ?? (height && weight ? (weight / ((height / 100) ** 2)).toFixed(1) : null);
+  const updated = record?.record_date || record?.created_at;
+  const updatedLabel = updated ? new Date(updated).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : null;
 
   return (
-
     <Card className="h-full">
-
-      {/* Header */}
-
-      <div className="mb-6 flex items-center justify-between">
-
-        <div>
-
-          <h2 className="text-xl font-bold text-slate-800">
-            Health Snapshot
-          </h2>
-
-          <p className="text-sm text-slate-500">
-            Your latest health overview
-          </p>
-
-        </div>
-
-        <HeartPulse
-          size={30}
-          className="text-red-500"
-        />
-
+      <div className="flex items-start justify-between gap-3">
+        <div><h2 className="text-lg font-semibold text-slate-900">Health snapshot</h2><p className="mt-1 text-sm text-slate-500">Latest details from your health record</p></div>
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><HeartPulse size={21} aria-hidden="true" /></span>
       </div>
-
-      {/* Health Information */}
-
-      <div className="grid grid-cols-2 gap-5">
-
-        <HealthItem
-          icon={<HeartPulse size={18} />}
-          title="BMI"
-          value={health.bmi}
-        />
-
-        <HealthItem
-          icon={<Droplets size={18} />}
-          title="Blood Group"
-          value={health.bloodGroup}
-        />
-
-        <HealthItem
-          icon={<Ruler size={18} />}
-          title="Height"
-          value={health.height}
-        />
-
-        <HealthItem
-          icon={<Weight size={18} />}
-          title="Weight"
-          value={health.weight}
-        />
-
-      </div>
-
-      {/* Footer */}
-
-      <div className="mt-8 flex items-center justify-between border-t pt-5">
-
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-
-          <CalendarClock size={18} />
-
-          Updated {health.updated}
-
-        </div>
-
-        <Button className="flex items-center gap-2">
-
-          View
-
-          <ArrowRight size={16} />
-
-        </Button>
-
-      </div>
-
+      {loading ? <div className="mt-6 grid grid-cols-2 gap-3">{[1, 2, 3, 4].map((item) => <div key={item} className="h-24 animate-pulse rounded-xl bg-slate-100" />)}</div> : (
+        <>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <HealthItem icon={HeartPulse} title="BMI" value={display(bmi)} />
+            <HealthItem icon={Droplets} title="Blood group" value={display(record?.blood_group ?? profile?.blood_group)} />
+            <HealthItem icon={Ruler} title="Height" value={display(height, " cm")} />
+            <HealthItem icon={Weight} title="Weight" value={display(weight, " kg")} />
+          </div>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <p className="inline-flex items-center gap-2 text-xs text-slate-500"><CalendarClock size={15} aria-hidden="true" />{updatedLabel ? `Updated ${updatedLabel}` : "No health record yet"}</p>
+            <Link to="/health-records" className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{record ? "View record" : "Add health details"}<ArrowRight size={15} aria-hidden="true" /></Link>
+          </div>
+        </>
+      )}
     </Card>
-
   );
-
 };
-
-// ===============================
-// Small Reusable Item
-// ===============================
-
-const HealthItem = ({
-  icon,
-  title,
-  value,
-}) => {
-
-  return (
-
-    <div className="rounded-xl bg-slate-50 p-4">
-
-      <div className="mb-3 text-blue-600">
-
-        {icon}
-
-      </div>
-
-      <p className="text-sm text-slate-500">
-
-        {title}
-
-      </p>
-
-      <h3 className="mt-1 text-lg font-semibold text-slate-800">
-
-        {value}
-
-      </h3>
-
-    </div>
-
-  );
-
-};
-
-// ===============================
-// Export
-// ===============================
 
 export default HealthCard;
