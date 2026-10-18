@@ -9,7 +9,7 @@ import WelcomeBanner from "../components/dashboard/WelcomeBanner";
 import QuickActions from "../components/dashboard/QuickActions";
 import StatsCard from "../components/dashboard/StatsCard";
 import HealthCard from "../components/dashboard/HealthCard";
-import ActivityTimeline from "../components/dashboard/ActivityTImeline";
+import ActivityTimeline from "../components/dashboard/ActivityTimeline";
 import AIInsightCard from "../components/dashboard/AIInsightCard";
 import AppointmentCard from "../components/dashboard/AppointmentCard";
 import RiskSummary from "../components/dashboard/RiskSummary";
