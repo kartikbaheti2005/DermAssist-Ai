@@ -1,372 +1,141 @@
-import { useState } from "react";
-
-//import DashboardLayout from "../components/layout/DashboardLayout";
-
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { Upload, Brain, CheckCircle2, Image as ImageIcon, Info, Camera, Sun, ScanLine, AlertCircle } from "lucide-react";
 import UploadCard from "../components/prediction/UploadCard";
 import ProcessingLoader from "../components/prediction/ProcessingLoader";
 import ResultCard from "../components/prediction/ResultCard";
 import ExplainableAI from "../components/prediction/ExplainableAI";
 import RecommendationPanel from "../components/prediction/RecommendationPanel";
-import { predictImage } from "../api/predictionApi";
+import { predictImage, getPredictionHeatmap, getRecommendations } from "../api/predictionApi";
 import { uploadImage } from "../api/imageApi";
 
-import {
-  Upload,
-  Brain,
-  CheckCircle2,
-  Image as ImageIcon,
-  Info,
-  Camera,
-  Sun,
-  ScanLine,
-} from "lucide-react";
+const PAGE_STATE = { UPLOAD: "upload", PROCESSING: "processing", RESULT: "result" };
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://dermassist-ai-backend.onrender.com").replace(/\/$/, "");
+const assetUrl = (path) => {
+  if (!path) return null;
+  const normalized = String(path).replaceAll("\\", "/");
+  const uploadsIndex = normalized.lastIndexOf("uploads/");
+  const relative = uploadsIndex >= 0 ? normalized.slice(uploadsIndex + "uploads/".length) : normalized.split("/").pop();
+  return `${API_BASE_URL}/uploads/${relative.split("/").map(encodeURIComponent).join("/")}`;
+};
+const errorMessage = (error) => error?.response?.data?.detail || error?.response?.data?.message || error?.message || "The analysis could not be completed. Please try again.";
 
-const PAGE_STATE = {
-  UPLOAD: "upload",
-  PROCESSING: "processing",
-  RESULT: "result",
-};  
+const ScanTips = () => (
+  <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:p-7">
+    <div className="flex items-center gap-3">
+      <Info size={24} className="text-blue-600" aria-hidden="true" />
+      <div><h2 className="text-lg font-bold text-slate-900">Prepare your image</h2><p className="text-sm text-slate-500">A clear photo can help the model process it.</p></div>
+    </div>
+    <div className="mt-6 space-y-5">
+      {[
+        [Sun, "Good lighting", "Use bright, even light and avoid strong shadows."],
+        [Camera, "Show the whole area", "Keep the lesion and surrounding skin in frame."],
+        [ScanLine, "Sharp focus", "Hold steady and avoid blurry images."],
+        [ImageIcon, "Simple background", "Keep unrelated objects out of the frame."],
+      ].map(([Icon, title, description]) => (
+        <div key={title} className="flex items-start gap-3"><Icon size={19} className="mt-0.5 shrink-0 text-blue-600" aria-hidden="true" /><div><h3 className="text-sm font-semibold text-slate-800">{title}</h3><p className="mt-1 text-sm leading-5 text-slate-500">{description}</p></div></div>
+      ))}
+    </div>
+  </aside>
+);
 
 const LesionTrackerPage = () => {
-  /**
-   * -------------------------------------------------------
-   * Temporary page state
-   *
-   * Replace these transitions later with actual API calls.
-   * Business logic intentionally untouched.
-   * -------------------------------------------------------
-   */
-
   const [pageState, setPageState] = useState(PAGE_STATE.UPLOAD);
-  const [prediction, setPrediction] = useState(null);
+  const [result, setResult] = useState(null);
+  const [evidence, setEvidence] = useState(null);
+  const [recommendations, setRecommendations] = useState(null);
+  const [error, setError] = useState("");
+  const [supplementaryLoading, setSupplementaryLoading] = useState(false);
+  const analysisRequest = useRef(0);
 
   const handleAnalyze = async (imageFile) => {
-  
-      setPageState(PAGE_STATE.PROCESSING);
-  
-      try {
-      
-          const upload = await uploadImage(imageFile);
-      
-          console.log("Upload Response:", upload);
-      
-          const prediction = await predictImage(
-              upload.image.id
-          );
-        
-          console.log(JSON.stringify(prediction.prediction,null,2));
-        
-          setPrediction(prediction.prediction);
-        
-          setPageState(PAGE_STATE.RESULT);
-        
-      } catch (error) {
-      
-          console.error(error);
-      
-          alert("Prediction failed.");
-      
-          setPageState(PAGE_STATE.UPLOAD);
-      
-      }
-    
+    const requestId = ++analysisRequest.current;
+    setError("");
+    setResult(null);
+    setEvidence(null);
+    setRecommendations(null);
+    setSupplementaryLoading(false);
+    setPageState(PAGE_STATE.PROCESSING);
+    try {
+      const upload = await uploadImage(imageFile);
+      if (requestId !== analysisRequest.current) return;
+      const image = upload?.image;
+      if (!image?.id) throw new Error("The image upload did not return an image record.");
+      const response = await predictImage(image.id);
+      if (requestId !== analysisRequest.current) return;
+      const prediction = response?.prediction;
+      if (!prediction?.id) throw new Error("The model did not return a saved prediction.");
+      setResult({ prediction, originalUrl: assetUrl(image.image_path || image.image_name) });
+      setEvidence({ original_url: assetUrl(image.image_path || image.image_name), heatmap_url: null, overlay_url: null });
+      setSupplementaryLoading(true);
+      setPageState(PAGE_STATE.RESULT);
+
+      Promise.allSettled([
+        getPredictionHeatmap(prediction.id),
+        getRecommendations(prediction.id),
+      ]).then(([heatmapResult, recommendationResult]) => {
+        if (requestId !== analysisRequest.current) return;
+        const heatmap = heatmapResult.status === "fulfilled" ? heatmapResult.value : null;
+        setEvidence({
+          original_url: assetUrl(image.image_path || image.image_name),
+          heatmap_url: assetUrl(heatmap?.heatmap_url),
+          overlay_url: assetUrl(heatmap?.overlay_url),
+        });
+        setRecommendations(recommendationResult.status === "fulfilled" ? recommendationResult.value : null);
+        setSupplementaryLoading(false);
+      });
+    } catch (requestError) {
+      if (requestId !== analysisRequest.current) return;
+      setError(errorMessage(requestError));
+      setSupplementaryLoading(false);
+      setPageState(PAGE_STATE.UPLOAD);
+    }
   };
 
-  const handleAnalyzeAnother = () => {
+  const reset = () => {
+    analysisRequest.current += 1;
+    setResult(null);
+    setEvidence(null);
+    setRecommendations(null);
+    setSupplementaryLoading(false);
+    setError("");
     setPageState(PAGE_STATE.UPLOAD);
   };
 
   return (
-
-      <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
-
-        {/* =======================================================
-            PAGE HEADER
-        ======================================================= */}
-
-        <header>
-
-          <div className="flex items-start gap-4">
-
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100">
-
-              {pageState === PAGE_STATE.UPLOAD && (
-                <Upload className="text-blue-600" size={30} />
-              )}
-
-              {pageState === PAGE_STATE.PROCESSING && (
-                <Brain className="text-blue-600" size={30} />
-              )}
-
-              {pageState === PAGE_STATE.RESULT && (
-                <CheckCircle2
-                  className="text-green-600"
-                  size={30}
-                />
-              )}
-
-            </div>
-
-            <div>
-
-              <h1 className="text-4xl font-bold text-slate-900">
-                AI Skin Lesion Tracker
-              </h1>
-
-              <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-                Upload a skin lesion image to receive an AI-powered
-                dermatology analysis, explainable insights and
-                personalized medical recommendations.
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-
-                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                  JPG
-                </span>
-
-                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                  PNG
-                </span>
-
-                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                  JPEG
-                </span>
-
-                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                  Max 10 MB
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </header>
-
-        {/* =======================================================
-            UPLOAD STATE
-        ======================================================= */}
-
-        {pageState === PAGE_STATE.UPLOAD && (
-
-          <div className="grid gap-6 lg:grid-cols-8">
-
-            {/* Upload */}
-
-            <div className="lg:col-span-5">
-
-              <UploadCard
-                onAnalyze={handleAnalyze}
-              />
-
-            </div>
-
-            {/* Tips */}
-
-            <div className="space-y-6 lg:col-span-3">
-
-              <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-
-                <div className="flex items-center gap-3">
-
-                  <Info
-                    size={26}
-                    className="text-blue-600"
-                  />
-
-                  <div>
-
-                    <h2 className="text-xl font-bold text-slate-800">
-                      Scan Preparation Tips
-                    </h2>
-
-                    <p className="text-sm text-slate-500">
-                      Improve prediction quality.
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <div className="mt-8 space-y-5">
-
-                  <div className="flex items-start gap-3">
-
-                    <Sun
-                      size={20}
-                      className="mt-1 text-amber-500"
-                    />
-
-                    <div>
-
-                      <h3 className="font-semibold">
-                        Good Lighting
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        Use bright natural lighting whenever
-                        possible.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="flex items-start gap-3">
-
-                    <Camera
-                      size={20}
-                      className="mt-1 text-blue-600"
-                    />
-
-                    <div>
-
-                      <h3 className="font-semibold">
-                        Whole Lesion Visible
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        Ensure the complete lesion appears in
-                        the image.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="flex items-start gap-3">
-
-                    <ScanLine
-                      size={20}
-                      className="mt-1 text-green-600"
-                    />
-
-                    <div>
-
-                      <h3 className="font-semibold">
-                        Sharp Focus
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        Avoid blurry or low-resolution photos.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="flex items-start gap-3">
-
-                    <ImageIcon
-                      size={20}
-                      className="mt-1 text-purple-600"
-                    />
-
-                    <div>
-
-                      <h3 className="font-semibold">
-                        Neutral Background
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        Remove unnecessary objects around the
-                        lesion.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* =======================================================
-            PROCESSING STATE
-        ======================================================= */}
-
-        {pageState === PAGE_STATE.PROCESSING && (
-
-          <div className="mx-auto max-w-3xl">
-
-            <ProcessingLoader />
-
-            <div className="mt-8 text-center">
-
-              <p className="text-lg font-medium text-slate-700">
-                DermAssist AI is carefully analyzing your
-                image.
-              </p>
-
-              <p className="mt-3 text-slate-500">
-                This usually takes between 5–10 seconds.
-                Please keep this page open while the
-                prediction is generated.
-              </p>
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* =======================================================
-            RESULT STATE
-        ======================================================= */}
-
-        {pageState === PAGE_STATE.RESULT && (
-
-          <div className="space-y-6">
-
-            {/* Result */}
-
-            <ResultCard prediction={prediction}/>
-
-            {/* Lower Grid */}
-
-            <div className="grid gap-6 xl:grid-cols-12">
-
-              <div className="xl:col-span-7">
-
-                <ExplainableAI />
-
-              </div>
-
-              <div className="xl:col-span-5">
-
-                <RecommendationPanel />
-
-              </div>
-
-            </div>
-
-            {/* Analyze Again */}
-
-            <div className="flex justify-center pt-4">
-
-              <button
-                onClick={handleAnalyzeAnother}
-                className="rounded-xl bg-blue-600 px-8 py-4 font-semibold text-white transition hover:bg-blue-700"
-              >
-                Analyze Another Image
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
-
-      </div>
-  )
+    <div className="mx-auto max-w-7xl space-y-7 px-4 py-5 sm:px-6 lg:py-8">
+      <header className="flex items-start gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+          {pageState === PAGE_STATE.UPLOAD && <Upload size={23} aria-hidden="true" />}
+          {pageState === PAGE_STATE.PROCESSING && <Brain size={23} className="animate-pulse" aria-hidden="true" />}
+          {pageState === PAGE_STATE.RESULT && <CheckCircle2 size={23} aria-hidden="true" />}
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">AI skin screening</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">Upload a clear image for analysis by the DermAssist screening model. The result is decision support, not a medical diagnosis.</p>
+          <p className="mt-3 text-xs text-slate-500">JPG or PNG · up to 10 MB · Avoid including identifying details in the image</p>
+        </div>
+      </header>
+
+      {error && <div role="alert" className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"><AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" /><span>{error}</span></div>}
+
+      {pageState === PAGE_STATE.UPLOAD && <div className="grid items-start gap-6 lg:grid-cols-5"><div className="lg:col-span-3"><UploadCard onAnalyze={handleAnalyze} /></div><div className="lg:col-span-2"><ScanTips /></div></div>}
+
+      {pageState === PAGE_STATE.PROCESSING && <div className="mx-auto max-w-3xl"><ProcessingLoader /><p className="mt-4 text-center text-sm text-slate-500">The image is being uploaded and analyzed by the configured model. This can take a little while.</p></div>}
+
+      {pageState === PAGE_STATE.RESULT && result && <div className="dashboard-stagger space-y-6">
+        <ResultCard prediction={result.prediction} />
+        <div className="grid items-start gap-6 xl:grid-cols-12">
+          <div className="xl:col-span-7"><ExplainableAI evidence={evidence} evidenceLoading={supplementaryLoading} /></div>
+          <div className="xl:col-span-5"><RecommendationPanel recommendations={recommendations} riskLevel={result.prediction.risk_level} assessment={result.prediction} recommendationLoading={supplementaryLoading} /></div>
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          <Link to="/doctors" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">Find a dermatologist</Link>
+          <button type="button" onClick={reset} className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">Analyze another image</button>
+        </div>
+      </div>}
+    </div>
+  );
 };
 
 export default LesionTrackerPage;
