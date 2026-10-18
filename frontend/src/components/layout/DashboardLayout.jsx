@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MobileBottomNav from "./MobileBottomNav";
-import Breadcrumb from "./Breadcrumb";
+import Breadcrumb from "./BreadCrumb";
 
 // ===============================
 // Component
