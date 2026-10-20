@@ -1,12 +1,7 @@
 import { Download } from "lucide-react";
 
 const DownloadButton = ({ report }) => {
-  const handleDownload = () => {
-    console.log("Download report:", report.id);
-
-    // Backend Integration
-    // GET /reports/{report.id}/download
-  };
+  const handleDownload = () => window.print();
 
   return (
     <button
@@ -30,7 +25,7 @@ const DownloadButton = ({ report }) => {
     >
       <Download className="h-5 w-5" />
 
-      Download Report
+      Print or save as PDF
     </button>
   );
 };

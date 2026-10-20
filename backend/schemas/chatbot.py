@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # =====================================================
@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 class ChatMessageRequest(BaseModel):
     conversation_id: int
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
 
 
 # =====================================================
@@ -32,7 +32,7 @@ class ChatMessageResponse(BaseModel):
 class ChatHistoryItem(BaseModel):
     role: str
 
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
 
     timestamp: datetime
 
@@ -87,7 +87,7 @@ class ChatMessageResponse(BaseModel):
 
     role: str
 
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
 
     created_at: datetime
 

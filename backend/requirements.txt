@@ -20,3 +20,6 @@ requests
 tzdata
 
 bcrypt
+torch
+torchvision
+Pillow

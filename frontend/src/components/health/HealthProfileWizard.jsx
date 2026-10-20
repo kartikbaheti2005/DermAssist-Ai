@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import PersonalStep from "./steps/PersonalStep";
 import PhysicalStep from "./steps/PhysicalStep";
 import MedicalStep from "./steps/MedicalStep";
-import LifestyleStep from "./steps/LifeStyleStep";
+import LifeStyleStep from "./steps/LifeStyleStep";
 import ReviewStep from "./steps/ReviewStep";
 
 const steps = [
@@ -17,9 +17,11 @@ const steps = [
 const HealthProfileWizard = ({
   onComplete,
   initialData = null,
+  error = "",
 }) => {
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     age: "",
@@ -229,6 +231,8 @@ const HealthProfileWizard = ({
 
         {renderStep()}
 
+        {error && <p role="alert" className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+
       </div>
 
       {/* Footer */}
@@ -253,24 +257,21 @@ const HealthProfileWizard = ({
         </button>
 
         <button
-         onClick={() => {
+         disabled={saving}
+         onClick={async () => {
 
-          if (currentStep < 4) {
-        
+         if (currentStep < 4) {
             setCurrentStep(currentStep + 1);
-        
           } else {
-        
-            console.log(formData);
-        
             if (onComplete) {
-            
-              onComplete(formData);
-            
+              setSaving(true);
+              try {
+                await onComplete(formData);
+              } finally {
+                setSaving(false);
+              }
             }
-        
           }
-        
         }}
           className="
             rounded-xl
@@ -283,7 +284,7 @@ const HealthProfileWizard = ({
         >
 
           {currentStep === 4
-            ? "Save Health Profile"
+            ? saving ? "Saving…" : "Save Health Profile"
             : "Next"}
 
         </button>

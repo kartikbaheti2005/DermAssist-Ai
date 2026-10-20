@@ -24,6 +24,7 @@ from services.prediction_service import (
     delete_prediction,
     get_prediction_explanation,
     get_prediction_heatmap,
+    serialize_prediction,
 )
 
 router = APIRouter(
@@ -53,7 +54,7 @@ def predict_image_route(
             "message":
                 "Prediction completed",
             "prediction":
-                prediction.to_dict(),
+                serialize_prediction(prediction),
         }
 
     except ValueError as e:
@@ -79,7 +80,7 @@ def prediction_history(
     )
 
     return [
-        prediction.to_dict()
+        serialize_prediction(prediction)
         for prediction in predictions
     ]
 
@@ -100,22 +101,16 @@ def prediction_detail(
         current_user.id,
     )
 
-    image = (
-        db.query(Image)
-          .filter(Image.id == prediction.image_id)
-          .first()
-    )
-
     if not prediction:
+        raise HTTPException(status_code=404, detail="Prediction not found")
 
-        raise HTTPException(
-            status_code=404,
-            detail="Prediction not found",
-        )
+    image = db.query(Image).filter(Image.id == prediction.image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
 
     return {
 
-        **prediction.to_dict(),
+        **serialize_prediction(prediction),
 
         "image": {
 
@@ -223,3 +218,4 @@ def prediction_heatmap(
             status_code=404,
             detail=str(e),
         )
+

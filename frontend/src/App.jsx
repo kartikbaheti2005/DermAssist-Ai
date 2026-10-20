@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./components/routes/ProtectedRoute";
@@ -6,36 +7,36 @@ import AdminRoute from "./components/routes/AdminRoute";
 
 import DashboardLayout from "./components/layout/DashboardLayout";
 
-// Public Pages
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const Home = lazy(() => import("./pages/Home"));
+const HealthRecordsPage = lazy(() => import("./pages/HealthRecordsPage"));
+const LesionTrackerPage = lazy(() => import("./pages/LesionTrackerPage"));
+const QueuePage = lazy(() => import("./pages/QueuePage"));
+const OutbreakPage = lazy(() => import("./pages/OutbreakPage"));
+const DoctorsPage = lazy(() => import("./pages/DoctorsPage"));
+const AppointmentPage = lazy(() => import("./pages/AppointmentPage"));
+const AppointmentBookingPage = lazy(() => import("./pages/AppointmentBookingPage"));
+const ReportPage = lazy(() => import("./pages/ReportPage"));
+const ReportViewerPage = lazy(() => import("./pages/ReportViewerPage"));
+const AIAssistantPage = lazy(() => import("./pages/AIAssistantPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const DoctorDashboard = lazy(() => import("./pages/DoctorDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+import RouteTransition from "./components/common/RouteTransition";
+import RouteLoading from "./components/common/RouteLoading";
 
-// User Pages
-import Home from "./pages/Home";
-import HealthRecordsPage from "./pages/HealthRecordsPage";
-import LesionTrackerPage from "./pages/LesionTrackerPage";
-import QueuePage from "./pages/QueuePage";
-import OutbreakPage from "./pages/OutbreakPage";
-import DoctorsPage from "./pages/DoctorsPage";
-import AppointmentPage from "./pages/AppointmentPage";
-import AppointmentBookingPage from "./pages/AppointmentBookingPage";
-import ReportPage from "./pages/ReportPage";
-import ReportViewerPage from "./pages/ReportViewerPage";
-import AIAssistantPage from "./pages/AIAssistantPage";
-import ProfilePage from "./pages/ProfilePage";
-// Doctor Pages
-import DoctorDashboard from "./pages/DoctorDashboard";
-
-// Admin Pages
-import AdminDashboard from "./pages/AdminDashboard";
+const LoadPage = ({ page: Page }) => (
+  <Suspense fallback={<RouteLoading />}><Page /></Suspense>
+);
 
 function App() {
   return (
     <Routes>
 
       {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<RouteTransition><LoadPage page={LoginPage} /></RouteTransition>} />
+      <Route path="/register" element={<RouteTransition><LoadPage page={RegisterPage} /></RouteTransition>} />
 
       {/* User Routes */}
       <Route
@@ -45,56 +46,56 @@ function App() {
           </ProtectedRoute>
         }
       >
-      <Route index element={<Home />} />
+      <Route index element={<LoadPage page={Home} />} />
       
       <Route
           path="health-records"
-          element={<HealthRecordsPage />}
+          element={<LoadPage page={HealthRecordsPage} />}
         />
 
       <Route
           path="lesion-tracker"
-          element={<LesionTrackerPage />}
+          element={<LoadPage page={LesionTrackerPage} />}
         />
 
       <Route
           path="queue"
-          element={<QueuePage />}
+          element={<LoadPage page={QueuePage} />}
         />
 
       <Route
           path="outbreak"
-          element={<OutbreakPage />}
+          element={<LoadPage page={OutbreakPage} />}
         />
 
       <Route
           path="/doctors"
-          element={<DoctorsPage />}
+          element={<LoadPage page={DoctorsPage} />}
       />
 
       <Route
           path="/appointments"
-          element={<AppointmentPage />}
+          element={<LoadPage page={AppointmentPage} />}
         />
    
       <Route
           path="/appointments/book"
-          element={<AppointmentBookingPage />}
+          element={<LoadPage page={AppointmentBookingPage} />}
         />
 
       <Route
           path="reports"
-          element={<ReportPage />}
+          element={<LoadPage page={ReportPage} />}
         />
 
       <Route
           path="reports/:reportId"
-          element={<ReportViewerPage />}
+          element={<LoadPage page={ReportViewerPage} />}
         />
 
       <Route
           path="/assistant"
-          element={<AIAssistantPage />}
+          element={<LoadPage page={AIAssistantPage} />}
         />
 
       <Route
@@ -106,7 +107,7 @@ function App() {
           path="/profile"
           element={
               <ProtectedRoute>
-                  <ProfilePage />
+                  <LoadPage page={ProfilePage} />
               </ProtectedRoute>
           }
       />
@@ -119,7 +120,7 @@ function App() {
         path="/doctor/dashboard"
         element={
           <DoctorRoute>
-            <DoctorDashboard />
+            <RouteTransition><LoadPage page={DoctorDashboard} /></RouteTransition>
           </DoctorRoute>
         }
       />
@@ -129,7 +130,7 @@ function App() {
         path="/admin"
         element={
           <AdminRoute>
-            <AdminDashboard />
+            <RouteTransition><LoadPage page={AdminDashboard} /></RouteTransition>
           </AdminRoute>
         }
       />

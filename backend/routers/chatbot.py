@@ -18,6 +18,8 @@ from schemas.chatbot import (
     ConversationUpdateRequest,
 )
 
+from services.llm_provider import LLMProviderError, provider_is_configured
+
 from services.chatbot_service import (
     process_chat_message,
     create_conversation,
@@ -60,6 +62,8 @@ def send_message(
             status_code=404,
             detail=str(e),
         )
+    except LLMProviderError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 # =====================================================
 # Health Check
@@ -70,7 +74,7 @@ def chatbot_health():
     return {
         "status": "healthy",
         "service": "chatbot",
-        "llm_connected": False,
+        "llm_connected": provider_is_configured(),
     }
 
 # =====================================================
@@ -210,4 +214,5 @@ def rename_conversation(
         "message": "Conversation updated",
         "conversation": updated.to_dict(),
     }
+
 

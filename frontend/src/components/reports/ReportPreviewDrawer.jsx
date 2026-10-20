@@ -1,4 +1,4 @@
-import { X, Brain, UserRound, Percent } from "lucide-react";
+import { X, Brain, Percent } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import RiskBadge from "./RiskBadge";
@@ -47,11 +47,7 @@ const ReportPreviewDrawer = ({
         {/* Body */}
         <div className="space-y-6 p-6">
 
-          <img
-            src={report.image}
-            alt={report.disease}
-            className="h-56 w-full rounded-2xl object-cover"
-          />
+          {report.image ? <img src={report.image} alt="Uploaded skin scan" className="h-56 w-full rounded-2xl object-cover" /> : <div className="flex h-40 items-center justify-center rounded-2xl bg-slate-50 text-sm text-slate-500">No scan preview available</div>}
 
           <div>
 
@@ -75,26 +71,6 @@ const ReportPreviewDrawer = ({
 
           </div>
 
-          <div className="rounded-xl bg-slate-50 p-4">
-
-            <div className="mb-2 flex items-center gap-2">
-
-              <UserRound className="h-5 w-5 text-slate-500" />
-
-              <span className="font-semibold">
-                Dermatologist
-              </span>
-
-            </div>
-
-            <p>{report.doctor.name}</p>
-
-            <p className="text-sm text-slate-500">
-              {report.doctor.specialization}
-            </p>
-
-          </div>
-
           <div>
 
             <div className="mb-2 flex items-center gap-2">
@@ -107,9 +83,7 @@ const ReportPreviewDrawer = ({
 
             </div>
 
-            <p className="text-sm leading-6 text-slate-600">
-              {report.aiSummary}
-            </p>
+            <p className="text-sm leading-6 text-slate-600">Model output: {report.disease || "Unavailable"}. This is an AI screening result, not a confirmed diagnosis.</p>
 
           </div>
 

@@ -19,9 +19,7 @@ const ReportActions = ({ report }) => {
       subtitle: "Save this report for future reference.",
       icon: Download,
       color: "bg-sky-100 text-sky-600",
-      onClick: () => {
-        alert("PDF export will be available in Phase 6.");
-      },
+      onClick: () => window.print(),
     },
     {
       title: "Print Report",
@@ -35,25 +33,15 @@ const ReportActions = ({ report }) => {
       subtitle: "Share this report with your doctor.",
       icon: Share2,
       color: "bg-green-100 text-green-600",
-      onClick: () => {
-      if (navigator.clipboard) {
-      
-          navigator.clipboard.writeText(
-              `${window.location.origin}/reports/${report.id}`
-          );
-        
-          alert("Report link copied.");
-        
-      } else {
-      
-          prompt(
-              "Copy this link:",
-              `${window.location.origin}/reports/${report.id}`
-          );
-        
-      }
-
-        alert("Report link copied.");
+      onClick: async () => {
+        const link = `${window.location.origin}/reports/${report.id}`;
+        try {
+          if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+          await navigator.clipboard.writeText(link);
+          window.alert("Report link copied.");
+        } catch {
+          window.prompt("Copy this report link:", link);
+        }
       },
     },
     {

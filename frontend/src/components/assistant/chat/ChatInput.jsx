@@ -1,81 +1,20 @@
 import { ImagePlus, Mic, Send } from "lucide-react";
 import { useState } from "react";
 import SuggestedFollowUps from "../suggestions/SuggestedFollowUps";
-
-const ChatInput = ({
-  onSendMessage,
-  suggestedFollowUps,
-  onFollowUp,
-}) => {
-
-  console.log(onFollowUp);
+const ChatInput = ({ onSendMessage, suggestedFollowUps, onFollowUp, disabled = false }) => {
   const [message, setMessage] = useState("");
-   
-  const handleSend = () => {
-    const trimmedMessage = message.trim();
-
-    if (!trimmedMessage) return;
-
-    onSendMessage(trimmedMessage);
-
-    setMessage("");
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      handleSend();
-    }
-  };
-
+  const send = () => { const text = message.trim(); if (!text || disabled) return; onSendMessage(text); setMessage(""); };
+  const onKeyDown = (event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send(); } };
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-
-      <SuggestedFollowUps
-          followUps={suggestedFollowUps}
-          onFollowUp={onFollowUp}
-      />
-      <div className="flex items-end gap-3">
-        {/* Future Features */}
-        <div className="flex gap-2">
-          <button
-            disabled
-            title="Attach Image (Coming Soon)"
-            className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 disabled:cursor-not-allowed"
-          >
-            <ImagePlus size={20} />
-          </button>
-
-          <button
-            disabled
-            title="Voice Assistant (Coming Soon)"
-            className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 disabled:cursor-not-allowed"
-          >
-            <Mic size={20} />
-          </button>
-        </div>
-
-        {/* Input */}
-        <textarea
-          rows={2}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask anything about your skin health..."
-          className="flex-1 min-h-[56px] rounded-lg border border-gray-300 px-4 py-3 text-base outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-        />
-
-        {/* Send */}
-        <button
-          onClick={handleSend}
-          disabled={!message.trim()}
-          className="rounded-lg bg-blue-600 p-3 h-12 w-12 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          <Send size={20} />
-        </button>
+    <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm sm:px-4">
+      <SuggestedFollowUps followUps={suggestedFollowUps} onFollowUp={onFollowUp} />
+      <div className="flex items-end gap-2 sm:gap-3">
+        <div className="hidden gap-1 sm:flex"><button type="button" disabled title="Image attachment is not available yet" aria-label="Image attachment unavailable" className="rounded-lg p-2 text-slate-400"><ImagePlus size={19} /></button><button type="button" disabled title="Voice input is not available yet" aria-label="Voice input unavailable" className="rounded-lg p-2 text-slate-400"><Mic size={19} /></button></div>
+        <textarea rows={2} value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={onKeyDown} disabled={disabled} aria-label="Message the AI Assistant" placeholder="Ask about your saved information…" className="min-h-[54px] flex-1 resize-y rounded-xl border border-slate-300 px-3 py-3 text-sm outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 sm:px-4" />
+        <button type="button" onClick={send} disabled={!message.trim() || disabled} aria-label={disabled ? "Assistant is responding" : "Send message"} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-700 text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"><Send size={18} aria-hidden="true" /></button>
       </div>
+      <p className="mt-2 text-[11px] text-slate-400">Enter to send · Shift+Enter for a new line</p>
     </div>
   );
 };
-
 export default ChatInput;
