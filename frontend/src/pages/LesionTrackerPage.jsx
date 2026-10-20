@@ -10,7 +10,7 @@ import { predictImage, getPredictionHeatmap, getRecommendations } from "../api/p
 import { uploadImage } from "../api/imageApi";
 
 const PAGE_STATE = { UPLOAD: "upload", PROCESSING: "processing", RESULT: "result" };
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://dermassist-ai-backend.onrender.com").replace(/\/$/, "");
 const assetUrl = (path) => {
   if (!path) return null;
   const normalized = String(path).replaceAll("\\", "/");

@@ -42,7 +42,7 @@ const SkinScanSection = ({report}) => {
         <div>
 
           <img
-              src={`http://localhost:8000/${report.imagePath.replace(/\\/g, "/")}`}
+              src={`https://dermassist-ai-backend.onrender.com/${report.imagePath.replace(/\\/g, "/")}`}
               alt="Uploaded lesion"
               className="h-full w-full object-cover"
               onError={(e) => {
