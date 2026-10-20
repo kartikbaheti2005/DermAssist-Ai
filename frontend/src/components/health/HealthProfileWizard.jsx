@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import PersonalStep from "./steps/PersonalStep";
 import PhysicalStep from "./steps/PhysicalStep";
 import MedicalStep from "./steps/MedicalStep";
-import LifeStyleStep from "./steps/LifestyleStep";
+import LifeStyleStep from "./steps/LifeStyleStep";
 import ReviewStep from "./steps/ReviewStep";
 
 const steps = [
